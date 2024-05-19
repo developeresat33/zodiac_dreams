@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:zodiac_dreams/screens/home_page.dart';
-import 'package:zodiac_dreams/screens/select_horoscope.dart';
-import 'package:zodiac_dreams/services/storage_manager.dart';
+import 'package:zodiac_star/screens/login_page.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -12,24 +10,18 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
-  String? horoscope;
 
   @override
   void initState() {
     super.initState();
-    horoscope = StorageManager.getString('horoscope');
+
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1500),
     );
 
     _controller!.forward().whenComplete(() {
-      if (horoscope != '') {
-        print(horoscope);
-        Get.to(() => HomePage());
-      } else {
-        Get.to(() => SelectHoroscope());
-      }
+      Get.to(() => LoginPage());
     });
   }
 

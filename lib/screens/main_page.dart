@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:zodiac_dreams/common_widgets/card_tile.dart';
-import 'package:zodiac_dreams/utils/int_extension.dart';
+import 'package:zodiac_star/common_widgets/card_tile.dart';
+import 'package:zodiac_star/utils/int_extension.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
