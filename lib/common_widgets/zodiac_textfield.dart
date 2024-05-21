@@ -101,12 +101,15 @@ class ZodiacTextField extends StatelessWidget {
       obscureText: this.obscureText,
       decoration: decoration == null
           ? InputDecoration(
+              filled: true,
+              fillColor: Color.fromRGBO(30, 33, 37, 1),
               focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(width: 0.3,
-                      color: Colors.blue[800]!, style: BorderStyle.solid),
+                  borderSide: BorderSide(
+                      width: 0.3,
+                      color: Colors.blue[800]!,
+                      style: BorderStyle.solid),
                   borderRadius: BorderRadius.all(Radius.circular(12))),
-              enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white,width: 0.4),
+              enabledBorder: UnderlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12))),
               disabledBorder: UnderlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -122,7 +125,7 @@ class ZodiacTextField extends StatelessWidget {
               labelStyle: TextStyle(
                   fontSize: 14,
                   overflow: TextOverflow.clip,
-                  color: Colors.white.withOpacity(0.8)),
+                  color: Colors.white.withOpacity(0.7)),
               suffixIcon: this.suffixIcon,
               hintText: this.hintText,
               hintStyle: TextStyle(

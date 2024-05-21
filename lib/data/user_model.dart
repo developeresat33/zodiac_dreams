@@ -1,4 +1,7 @@
+import 'package:mongo_dart/mongo_dart.dart';
+
 class UserModel {
+  ObjectId? id;
   String? nick;
   String? nameSurname;
   String? age;
@@ -6,14 +9,18 @@ class UserModel {
   String? horoscope;
   String? password;
   int? gem;
+  String? fcmToken;
+
   UserModel(
-      {this.nick,
+      {this.id,
+      this.nick,
       this.nameSurname,
       this.age,
       this.birthDate,
       this.horoscope,
       this.password,
-      this.gem = 0});
+      this.gem = 0,
+      this.fcmToken});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -24,12 +31,14 @@ class UserModel {
     data['horoscope'] = this.horoscope;
     data['password'] = this.password;
     data['gem'] = this.gem;
+    data['fcmToken'] = this.fcmToken;
     return data;
   }
 
   static UserModel parseRegisterModelFromDocument(
       Map<String, dynamic> document) {
     return UserModel(
+      id: document['_id'],
       nick: document['nick'],
       nameSurname: document['nameSurname'],
       age: document['age'],

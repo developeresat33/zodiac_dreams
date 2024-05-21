@@ -23,10 +23,12 @@ class CardTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap ?? null,
+      borderRadius: BorderRadius.circular(12),
+      splashColor: Colors.white,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: backgroundColor ?? Colors.blue[800],
+          color: backgroundColor ?? Colors.blue[800]!.withOpacity(0.8),
         ),
         child: ListTile(
           leading: leading != null
@@ -51,13 +53,11 @@ class CardTile extends StatelessWidget {
           title: Text(
             title,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           subtitle: desp != null
               ? Text(
                   desp!,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                 )
               : null,
           trailing: trailing != null

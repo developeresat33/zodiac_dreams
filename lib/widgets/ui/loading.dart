@@ -18,6 +18,7 @@ void onLoading(bool isOk) {
               padding: const EdgeInsets.all(16.0),
               child: new Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     height: 35,

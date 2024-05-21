@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "521042969122",
+    "project_id": "zodiacstar-3099d",
+    "storage_bucket": "zodiacstar-3099d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521042969122:android:c38fbd8193a41caeb0007b",
+        "android_client_info": {
+          "package_name": "com.proud.zodiac_star"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3OpvsL89vOtn07kxcNl1CnSto1b8WTe8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

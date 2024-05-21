@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/card_tile.dart';
+import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
+import 'package:zodiac_star/widgets/ui/loading.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -14,21 +18,19 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        15.h,
-        Row(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer(
+        builder: (context, UserProvider _, child) => Column(
               children: [
+                15.h,
                 Row(
                   children: [
-                    Text(
-                      "Hoşgeldiniz , ",
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 24),
+                    GestureDetector(
+          /*             onTap: () => _.sendPushMessage(), */
+                      child: Text(
+                        "Hoşgeldiniz ,${_.userModel!.nameSurname} ",
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ),
                   ],
                 ),
@@ -42,41 +44,45 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ],
                 ),
-              ],
-            ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.centerRight,
-                height: 75,
-                width: 75,
-                child: Image.asset(
-                  "assets/logo.png",
-                  fit: BoxFit.scaleDown,
+                15.h,
+                CardTile(
+                  onTap: () => print("sdsd"),
+                  leading: FontAwesomeIcons.wandMagicSparkles,
+                  title: "Bir uzman'dan tabir yorumu al",
+                  desp:
+                      "Rüyanızı uzman rüya tabircilerimize yorumlatmak için tıklayınız..",
+                  trailing: Icons.chevron_right_outlined,
                 ),
-              ),
-            ),
-          ],
-        ),
-        15.h,
-        Expanded(
-          child: ListView(
-            children: [
-              CardTile(
-                onTap: () => print("sdsd"),
-                leading: FontAwesomeIcons.wandMagicSparkles,
-                title: "Bir uzman'dan tabir yorumu al",
-                desp:
-                    "Rüyanızı uzman rüya tabircilerimize yorumlatmak için tıklayınız..",
-                trailing: Icons.chevron_right_outlined,
-              ),
-              10.h,
-              Divider(
-                thickness: 0.5,
-              )
-            ],
-          ),
-        )
-      ],
-    ).paddingSymmetric(horizontal: 20);
+                10.h,
+                Divider(
+                  thickness: 0.5,
+                ),
+                Expanded(
+                    child: FutureBuilder<List<Map<String, String>>>(
+                  future: _.fetchData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: getLoading());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Hata: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('Veri bulunamadı.'));
+                    } else {
+                      List<Map<String, String>> data = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          return CardTile(
+                            backgroundColor: Color.fromRGBO(30, 33, 37, 1),
+                            title: data[index]['title']!,
+                            desp: data[index]['description']!,
+                          ).paddingOnly(bottom: 10);
+                        },
+                      );
+                    }
+                  },
+                ))
+              ],
+            ).paddingSymmetric(horizontal: 10));
   }
 }

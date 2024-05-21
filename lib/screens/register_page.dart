@@ -4,11 +4,12 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/common_widgets/zodiac_textfield.dart';
-import 'package:zodiac_star/data/register_model.dart';
+import 'package:zodiac_star/data/user_model.dart';
 import 'package:zodiac_star/dialogs/user_dialog.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/select_date.dart';
+import 'package:zodiac_star/widgets/ui/app_bar.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -33,6 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return SafeArea(
       child: Consumer(
           builder: (context, UserProvider _, child) => Scaffold(
+            appBar: AppBarWidget.getAppBar("Kayıt Ol"),
                 resizeToAvoidBottomInset: true,
                 body: Column(
                   children: [
@@ -58,6 +60,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     }
                                     return null;
                                   },
+                                  onEditingComplete: () =>
+                                      Get.focusScope!.nextFocus(),
                                 ))
                               ],
                             ),
@@ -66,7 +70,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               children: [
                                 Expanded(
                                     child: ZodiacTextField(
-                                  controller: _.registerController!.nameSurnameCt,
+                                  controller:
+                                      _.registerController!.nameSurnameCt,
                                   hintText: "Adınız Soyadınız",
                                   onChanged: (value) =>
                                       _.registerModel!.nameSurname = value,
@@ -76,6 +81,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     }
                                     return null;
                                   },
+                                  onEditingComplete: () =>
+                                      Get.focusScope!.nextFocus(),
                                 ))
                               ],
                             ),
@@ -95,6 +102,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     }
                                     return null;
                                   },
+                                  onEditingComplete: () =>
+                                      Get.focusScope!.nextFocus(),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
                                     LengthLimitingTextInputFormatter(2),
@@ -111,7 +120,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   readOnly: true,
                                   hintText: "Doğum Tarihiniz",
                                   onTap: () {
-                                    selectDate(_.registerController!.birthDateCt!,
+                                    selectDate(
+                                        _.registerController!.birthDateCt!,
                                         option: 0);
                                   },
                                   validator: (p0) {
@@ -159,6 +169,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     }
                                     return null;
                                   },
+                                  onEditingComplete: () =>
+                                      Get.focusScope!.nextFocus(),
                                 ))
                               ],
                             ),
@@ -174,9 +186,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                   validator: (p0) {
                                     if (_.registerController!.passwordCt !=
                                             null &&
-                                        _.registerController!.confirmPasswordCt !=
+                                        _.registerController!
+                                                .confirmPasswordCt !=
                                             null &&
-                                        _.registerController!.passwordCt!.text !=
+                                        _.registerController!.passwordCt!
+                                                .text !=
                                             _.registerController!
                                                 .confirmPasswordCt!.text) {
                                       return "*Şifreler Uyuşmuyor";

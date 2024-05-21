@@ -11,12 +11,13 @@ class UserDialog {
     showModalBottomSheet(
         isScrollControlled: true,
         context: Get.context!,
+        useSafeArea: true,
         builder: (context) {
           return Consumer<UserProvider>(
               builder: (context, _value, child) =>
                   StatefulBuilder(builder: (context, setState) {
                     return Container(
-                        color: Color.fromRGBO(42, 48, 70, 1),
+                        color: Color.fromRGBO(34, 40, 49, 1),
                         height: Functions.screenSize.height * 0.99,
                         width: double.maxFinite,
                         child: Column(
