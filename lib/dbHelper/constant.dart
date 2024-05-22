@@ -5,6 +5,9 @@ const USER_COLLECTION = "users";
 const FAV_COLLECTION = "favoriteDreams";
 const DREAM_TITLE_COLLECTION = "dreamTitles";
 const DREAM_COLLECTION = "dreams";
+const EXPERT_COLLECTION = "expert_user";
+const EXPERT_ACCOUNT_COLLECTION = "expert_account";
+const REQUEST_COLLECTION = "requesDreams";
 
 
 /* const user= "demo_user";

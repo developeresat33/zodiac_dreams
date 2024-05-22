@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:zodiac_star/data/menu_items.dart';
+import 'package:zodiac_star/screens/expression_comment.dart';
 import 'package:zodiac_star/screens/expressions.dart';
 import 'package:zodiac_star/screens/main_page.dart';
+import 'package:zodiac_star/screens/purchase_gem.dart';
 import 'package:zodiac_star/states/home_page_provider.dart';
 import 'package:zodiac_star/states/user_provider.dart';
-import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/drawer/main_drawer.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
+import 'package:zodiac_star/widgets/ui/gem_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,44 +39,12 @@ class _HomePageState extends State<HomePage> {
                 drawer: MainDrawer(),
                 appBar: AppBarWidget.getAppBar("Zodyak Yıldızı",
                     isAction: true,
-                    action: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color.fromRGBO(49, 54, 63, 0.9),
-                            Color.fromRGBO(49, 54, 63, 0.8),
-                            Color.fromRGBO(49, 54, 63, 0.7)
-                          ],
-                        ),
+                    action: InkWell(
                         borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.centerRight,
-                      height: 40,
-                      width: 100,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          15.w,
-                          Expanded(
-                            child: Text(
-                              "${_2.userModel!.gem}",
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                          ),
-                          10.w,
-                          Icon(
-                            FontAwesomeIcons.gem,
-                            size: 20,
-                            color: Colors.blue[400],
-                          ),
-                          10.w,
-                        ],
-                      ),
-                    ),
+                        onTap: () => Get.to(() => PurchaseGem()),
+                        child: GemWidget(
+                          data: _2.userModel!.gem,
+                        )),
                     leading: IconButton(
                         onPressed: () {
                           _scaffoldKey.currentState!.openDrawer();
@@ -86,11 +55,7 @@ class _HomePageState extends State<HomePage> {
                 body: PageView(
                   physics: NeverScrollableScrollPhysics(),
                   controller: _.pageController,
-                  children: [
-                    MainPage(),
-                    Expressions(),
-                    Container(),
-                  ],
+                  children: [MainPage(), Expressions(), ExpressionComment()],
                 ),
                 bottomNavigationBar: Theme(
                   data: Theme.of(context).copyWith(

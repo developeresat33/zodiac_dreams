@@ -60,4 +60,8 @@ class ExpressionProvider extends ChangeNotifier {
         .findOne(where.eq('dream_title', title));
     return Dream.fromJson(result);
   }
+
+  Future<List<Map<String, dynamic>>> getExperts() async {
+    return await MongoDatabase.expertCollection.find().toList();
+  }
 }

@@ -7,6 +7,7 @@ class CardTile extends StatelessWidget {
   final String title;
   final IconData? leading;
   final IconData? trailing;
+  final bool? bottomPadding;
   final bool isCircle;
   final Function()? onTap;
   const CardTile(
@@ -17,6 +18,7 @@ class CardTile extends StatelessWidget {
       this.leading,
       this.trailing,
       this.backgroundColor,
+      this.bottomPadding = false,
       this.isCircle = false});
 
   @override
@@ -52,9 +54,10 @@ class CardTile extends StatelessWidget {
               : null,
           title: Text(
             title,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
+          ).paddingOnly(bottom: bottomPadding! ? 10 : 0),
           subtitle: desp != null
               ? Text(
                   desp!,

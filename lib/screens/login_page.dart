@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/common_widgets/zodiac_textfield.dart';
 import 'package:zodiac_star/main.dart';
+import 'package:zodiac_star/screens/expert_login.dart';
 import 'package:zodiac_star/screens/register_page.dart';
 import 'package:zodiac_star/services/firebase_message.dart';
 import 'package:zodiac_star/services/notification_permission.dart';
@@ -70,20 +71,23 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Container(
-                              height: 190,
-                              width: 190,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(42, 48, 70, 1),
-                                  borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(100))),
+                            GestureDetector(
+                              onLongPress: () => Get.to(() => LoginExpert()),
                               child: Container(
-                                margin: EdgeInsets.only(left: 20),
-                                height: 130,
-                                width: 130,
-                                child: Image.asset(
-                                  "assets/splash.png",
-                                  fit: BoxFit.scaleDown,
+                                height: 190,
+                                width: 190,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(42, 48, 70, 1),
+                                    borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(100))),
+                                child: Container(
+                                  margin: EdgeInsets.only(left: 20),
+                                  height: 130,
+                                  width: 130,
+                                  child: Image.asset(
+                                    "assets/splash.png",
+                                    fit: BoxFit.scaleDown,
+                                  ),
                                 ),
                               ),
                             )
@@ -159,7 +163,10 @@ class _LoginPageState extends State<LoginPage> {
                                     children: [
                                       Expanded(
                                           child: CheckboxListTile(
-                                        title: Text("Beni Hatırla"),
+                                        title: Text(
+                                          "Beni Hatırla",
+                                          style: TextStyle(fontSize: 14),
+                                        ),
                                         value: _.rememberMe,
                                         onChanged: (value) =>
                                             _.setRemindMe(value),
@@ -168,15 +175,14 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   5.h,
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () {},
-                                          child: Text(
-                                            "Şifrenizi mi unuttunuz?",
-                                            style: TextStyle(
-                                                color: Colors.blue[400]),
-                                          ),
+                                      TextButton(
+                                        onPressed: () {},
+                                        child: Text(
+                                          "Şifrenizi mi unuttunuz?",
+                                          style: TextStyle(
+                                              color: Colors.blue[400]),
                                         ),
                                       )
                                     ],

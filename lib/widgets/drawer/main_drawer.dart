@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/card_tile.dart';
 import 'package:zodiac_star/screens/favorite_dreams.dart';
 import 'package:zodiac_star/screens/login_page.dart';
+import 'package:zodiac_star/screens/my_request.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 
@@ -30,6 +31,14 @@ class _MainDrawerState extends State<MainDrawer> {
                         title: "Favori Tabirlerim",
                         onTap: () {
                           Get.to(() => FavoriteDreams());
+                        },
+                      ),
+                      10.h,
+                      CardTile(
+                        leading: Icons.send,
+                        title: "Taleplerim",
+                        onTap: () {
+                          Get.to(() => MyRequest());
                         },
                       ),
                     ],

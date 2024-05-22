@@ -1,12 +1,15 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:zodiac_star/controller/register_controller.dart';
+import 'package:zodiac_star/data/expert_model.dart';
 import 'package:zodiac_star/data/user_model.dart';
 import 'package:zodiac_star/dbHelper/mongodb.dart';
 import 'package:zodiac_star/main.dart';
+import 'package:zodiac_star/screens/expert_home.dart';
 import 'package:zodiac_star/screens/home_page.dart';
 import 'package:zodiac_star/services/storage_manager.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
@@ -17,8 +20,11 @@ class UserProvider extends ChangeNotifier {
   bool? rememberMe = false;
   RegisterController? registerController = RegisterController();
   UserModel? registerModel, userModel;
+  ExpertModel? expertModel;
   TextEditingController? nickCt = TextEditingController();
   TextEditingController? passwordCt = TextEditingController();
+  TextEditingController? expertNickCt = TextEditingController();
+  TextEditingController? expertPasswordCt = TextEditingController();
   final webScraper = WebScraper('https://www.haberler.com');
 
   setRemindMe(bool? value) {
@@ -120,6 +126,44 @@ class UserProvider extends ChangeNotifier {
             StorageManager.setBool("remind", true);
           }
           Get.offAll(() => HomePage());
+        } else {
+          onLoading(true);
+          GetMsg.showMsg("Hatalı sifre.", option: 0);
+        }
+      } else {
+        onLoading(true);
+        GetMsg.showMsg("Kullanıcı bulunamadı.", option: 0);
+      }
+    });
+  }
+
+  loginExpert() async {
+    expertModel = ExpertModel();
+    onLoading(false);
+    await MongoDatabase.expertAccountCollection.findOne({
+      'expert_username': expertNickCt!.text,
+      'expert_pw': expertPasswordCt!.text,
+    }).then((value) async {
+      inspect(value);
+      if (value != null) {
+        if (value['expert_pw'] == expertPasswordCt!.text) {
+          String? fcmToken = await messaging!.getToken();
+          print(fcmToken);
+          await MongoDatabase.expertAccountCollection.updateOne(
+            where.eq('expert_username', expertNickCt!.text),
+            modify.set('fcmToken', fcmToken),
+          );
+
+          onLoading(true);
+          expertModel = ExpertModel.parseRegisterModelFromDocument(value);
+          expertModel!.fcmToken = fcmToken;
+          inspect(expertModel);
+/*           if (rememberMe!) {
+            StorageManager.setString("id", nickCt!.text);
+            StorageManager.setString("pw", passwordCt!.text);
+            StorageManager.setBool("remind", true);
+          } */
+          Get.offAll(() => ExpertHome());
         } else {
           onLoading(true);
           GetMsg.showMsg("Hatalı sifre.", option: 0);

@@ -7,6 +7,7 @@ import 'package:zodiac_star/dbHelper/mongodb.dart';
 import 'package:zodiac_star/screens/splash_screen.dart';
 import 'package:zodiac_star/states/expression_provider.dart';
 import 'package:zodiac_star/states/home_page_provider.dart';
+import 'package:zodiac_star/states/process_provider.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -19,6 +20,7 @@ void main() async {
   await MongoDatabase.connect();
   await StorageManager.initPrefs();
   runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => ProcessProvider()),
     ChangeNotifierProvider(create: (_) => ExpressionProvider()),
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => HomePageProvider()),

@@ -15,11 +15,6 @@ class MenuItems {
         title: FittedBox(fit: BoxFit.scaleDown, child: Text("Tabirler"))),
     SalomonBottomBarItem(
         icon: Icon(
-          Icons.card_giftcard,
-        ),
-        title: FittedBox(fit: BoxFit.scaleDown, child: Text("Söz Kartları"))),
-    SalomonBottomBarItem(
-        icon: Icon(
           Icons.edit_note_sharp,
         ),
         title: FittedBox(fit: BoxFit.scaleDown, child: Text("Tabir Yorumlat"))),
