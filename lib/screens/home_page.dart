@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    context.read<HomePageProvider>().currentIndex = 0;
     super.initState();
   }
 

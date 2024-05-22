@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class FirebaseMessagingHelper {
@@ -6,12 +9,43 @@ class FirebaseMessagingHelper {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print('Received a message while in the foreground!');
       print('Message data: ${message.data}');
-      GetMsg.showMsg('Message data: ${message.data}');
+      inspect(message);
+      GetMsg.showMsg('Message data: ${message.data}', option: 1);
       if (message.notification != null) {
+        showNotification(message.notification);
         print('Message also contained a notification: ${message.notification}');
       }
     });
+  }
 
-    // Diğer callback fonksiyonları buraya eklenebilir
+  static Future<void> showNotification(RemoteNotification? notification) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    final AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'your channel id',
+      'your channel name',
+      channelDescription: 'your channel description',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+    final NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      notification!.title,
+      notification.body,
+      platformChannelSpecifics,
+    );
   }
 }

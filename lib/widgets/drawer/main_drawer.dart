@@ -36,7 +36,7 @@ class _MainDrawerState extends State<MainDrawer> {
                   ).paddingSymmetric(horizontal: 10),
                   Spacer(),
                   Divider(
-                    thickness: 0.4,
+                    thickness: 0.1,
                   ),
                   ListTile(
                     title: Text("Çıkış Yap"),

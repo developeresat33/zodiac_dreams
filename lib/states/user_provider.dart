@@ -1,8 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -10,17 +6,25 @@ import 'package:web_scraper/web_scraper.dart';
 import 'package:zodiac_star/controller/register_controller.dart';
 import 'package:zodiac_star/data/user_model.dart';
 import 'package:zodiac_star/dbHelper/mongodb.dart';
+import 'package:zodiac_star/main.dart';
 import 'package:zodiac_star/screens/home_page.dart';
+import 'package:zodiac_star/services/storage_manager.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 import 'package:http/http.dart' as http;
 
 class UserProvider extends ChangeNotifier {
+  bool? rememberMe = false;
   RegisterController? registerController = RegisterController();
   UserModel? registerModel, userModel;
   TextEditingController? nickCt = TextEditingController();
   TextEditingController? passwordCt = TextEditingController();
   final webScraper = WebScraper('https://www.haberler.com');
+
+  setRemindMe(bool? value) {
+    rememberMe = value;
+    notifyListeners();
+  }
 
   String transformString(String input) {
     if (input.isEmpty) return input;
@@ -53,28 +57,42 @@ class UserProvider extends ChangeNotifier {
     onLoading(false);
 
     try {
-      String? fcmToken = await FirebaseMessaging.instance.getToken();
+      String? fcmToken = await messaging!.getToken();
+      print(fcmToken);
       registerModel!.fcmToken = fcmToken;
 
-      await createUserInFirebase(registerModel!);
-      await MongoDatabase.userCollection.save(registerModel!.toJson());
+      bool userExists = await checkUserExistsInMongoDB(registerModel!.nick!);
 
-      GetMsg.showMsg("Kayıt başarıyla tamamlandı.", option: 1);
-      userModel = registerModel;
-      onLoading(true);
-      Get.offAll(() => HomePage());
+      if (userExists) {
+        onLoading(true);
+        GetMsg.showMsg(
+            "Bu kullanıcı zaten kayıtlı.Lütfen başka bir kullanıcı adı giriniz.",
+            option: 0);
+      } else {
+        await MongoDatabase.userCollection.save(registerModel!.toJson());
+
+        GetMsg.showMsg("Kayıt başarıyla tamamlandı.", option: 1);
+        userModel = registerModel;
+        onLoading(true);
+        Get.offAll(() => HomePage());
+      }
     } catch (e) {
       onLoading(true);
       GetMsg.showMsg(
-        "Kayıt işlemi başarısız lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
-        option: 1,
+        "Kayıt işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
+        option: 0,
       );
     }
   }
 
-  Future<void> createUserInFirebase(UserModel userModel) async {
-    final firestoreInstance = FirebaseFirestore.instance;
-    await firestoreInstance.collection('users').add(userModel.toJson());
+  Future<bool> checkUserExistsInMongoDB(String nick) async {
+    final collection = MongoDatabase.userCollection;
+
+    var query = where.eq('nick', nick);
+
+    var result = await collection.findOne(query);
+
+    return result != null;
   }
 
   loginUser() async {
@@ -83,13 +101,24 @@ class UserProvider extends ChangeNotifier {
     await MongoDatabase.userCollection.findOne({
       'nick': nickCt!.text,
       'password': passwordCt!.text,
-    }).then((value) {
+    }).then((value) async {
       if (value != null) {
-        /*      inspect(value); // user modeli böyle çek */
         if (value['password'] == passwordCt!.text) {
+          String? fcmToken = await messaging!.getToken();
+
+          await MongoDatabase.userCollection.updateOne(
+            where.eq('nick', nickCt!.text),
+            modify.set('fcmToken', fcmToken),
+          );
+
           onLoading(true);
           userModel = UserModel.parseRegisterModelFromDocument(value);
-          log(userModel!.id.toString());
+          userModel!.fcmToken = fcmToken;
+          if (rememberMe!) {
+            StorageManager.setString("id", nickCt!.text);
+            StorageManager.setString("pw", passwordCt!.text);
+            StorageManager.setBool("remind", true);
+          }
           Get.offAll(() => HomePage());
         } else {
           onLoading(true);
@@ -135,37 +164,35 @@ class UserProvider extends ChangeNotifier {
     return result;
   }
 
- /*  String constructFCMPayload(/* String? token */) {
-    return jsonEncode({
-      'token':
-          "fzTFyQjdSK-TIaPil5j5S2:APA91bG6kVBmfk74R6r-0-k_kDOH_Cq-gCHZd-oxjaOvaVtlqp4bBk7lgWYGJ2nY8d-Q409hA9AAtJg6kANVIS9W6cbhQm_VWMiavHsEHmlgOxzOZrWITjYDxJpRKx3TQNWDjVF86_gX",
-      'data': {
-        'via': 'FlutterFire Cloud Messaging!!!',
-      },
-      'notification': {
-        'title': 'Hello FlutterFire!',
-        'body': 'This notification  was created via FCM!',
-      },
-    });
+  sendNotification() async {
+    http.post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
+        body: jsonEncode({
+          "to": "${userModel!.fcmToken}",
+          "content_available": true,
+          "apns-priority": "5",
+          "notification": {
+            "title": "Notification Title",
+            "body": "body body body body",
+            "sound": "none"
+          },
+          "data": {
+            "body": "Sigorta deneme",
+            "title": "Title",
+            "key_1": "50",
+            "key_2": "50",
+            "type": "auth",
+            "badge": "1"
+          },
+          "android": {"priority": "height", "ttl": "110"},
+          "apns": {
+            "headers": {"apns-priority": "5"}
+          },
+          "click_action": "FLUTTER_NOTIFICATION_CLICK"
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "Authorization":
+              "key=AAAAi5dUN7k:APA91bHu484HSosEfcIOUI00SOtBqV8usvqxS7hEruPnTad-Zb1p996iX3wV9ecDjGX6_YurZyXiFRWvsDL0vSe1tBcOouVDWz77M7W_2w8oHSQ2Lu6gPHYxDOctIDAkHvvcJg11eX9o"
+        });
   }
-
-  Future<void> sendPushMessage() async {
-/*     if (_token == null) {
-      print('Unable to send FCM message, no token exists.');
-      return;
-    } */
-
-    try {
-      await http.post(
-        Uri.parse('https://api.rnfirebase.io/messaging/send'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: constructFCMPayload(),
-      );
-      print('FCM request for device sent!');
-    } catch (e) {
-      print(e);
-    }
-  } */
 }

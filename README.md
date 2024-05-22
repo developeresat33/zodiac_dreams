@@ -1,4 +1,4 @@
-# my_project
+# Zodyak Yıldızı
 
 A new Flutter project.
 

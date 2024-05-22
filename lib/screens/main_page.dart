@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +24,7 @@ class _MainPageState extends State<MainPage> {
                 Row(
                   children: [
                     GestureDetector(
-          /*             onTap: () => _.sendPushMessage(), */
+                      onTap: () => _.sendNotification(),
                       child: Text(
                         "Hoşgeldiniz ,${_.userModel!.nameSurname} ",
                         overflow: TextOverflow.ellipsis,
@@ -55,7 +54,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 10.h,
                 Divider(
-                  thickness: 0.5,
+                  thickness: 0.1,
                 ),
                 Expanded(
                     child: FutureBuilder<List<Map<String, String>>>(

@@ -1,26 +1,37 @@
 {
   "project_info": {
-    "project_number": "521042969122",
-    "project_id": "zodiacstar-3099d",
-    "storage_bucket": "zodiacstar-3099d.appspot.com"
+    "project_number": "599539333049",
+    "firebase_url": "https://sdsdsds-9183d-default-rtdb.firebaseio.com",
+    "project_id": "sdsdsds-9183d",
+    "storage_bucket": "sdsdsds-9183d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:521042969122:android:c38fbd8193a41caeb0007b",
+        "mobilesdk_app_id": "1:599539333049:android:8f2d51c2cfe3bea35ae868",
         "android_client_info": {
           "package_name": "com.proud.zodiac_star"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "599539333049-jh2pl8g8phbfq97ojphdj44b51llcrhc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyD3OpvsL89vOtn07kxcNl1CnSto1b8WTe8"
+          "current_key": "AIzaSyDxzZHLhRr6i9knT2J3xTDtVgrgqpNjkaw"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599539333049-jh2pl8g8phbfq97ojphdj44b51llcrhc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

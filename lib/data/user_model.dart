@@ -46,6 +46,7 @@ class UserModel {
       horoscope: document['horoscope'],
       password: document['password'],
       gem: document['gem'],
+      fcmToken: document['fcmToken'],
     );
   }
 }
