@@ -24,6 +24,12 @@ class _MyRequestState extends State<MyRequest> {
     super.initState();
   }
 
+  Future<void> _refreshRequests() async {
+    setState(() {
+      _myRequestFuture = context.read<ProcessProvider>().getMyRequest();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -33,22 +39,24 @@ class _MyRequestState extends State<MyRequest> {
           children: [
             10.h,
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _myRequestFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: getLoading());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Hata: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('Talep mevcut değil.'));
-                  } else {
-                    var myRequests = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: myRequests.length,
-                      itemBuilder: (context, index) {
-                        var request = myRequests[index];
-                        return Container(
+              child: RefreshIndicator(
+                onRefresh: _refreshRequests,
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: _myRequestFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: getLoading());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Hata: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('Talep mevcut değil.'));
+                    } else {
+                      var myRequests = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: myRequests.length,
+                        itemBuilder: (context, index) {
+                          var request = myRequests[index];
+                          return Container(
                             decoration: BoxDecoration(
                               color: Color.fromRGBO(30, 33, 37, 1),
                               borderRadius: BorderRadius.circular(12),
@@ -56,8 +64,8 @@ class _MyRequestState extends State<MyRequest> {
                             padding: EdgeInsets.all(10),
                             child: ListTile(
                               title: Text(
-                                      "Gönderilen Yorumcu :  ${request['receiveName']}")
-                                  .paddingOnly(bottom: 5),
+                                "Gönderilen Yorumcu :  ${request['receiveName']}",
+                              ).paddingOnly(bottom: 5),
                               subtitle: Column(
                                 children: [
                                   Row(
@@ -79,36 +87,40 @@ class _MyRequestState extends State<MyRequest> {
                                       Row(
                                         children: [
                                           Icon(
-                                              request['isFinish']
-                                                  ? Icons.check_circle
-                                                  : Icons.watch_later_outlined,
-                                              color: request['isFinish']
-                                                  ? Colors.green
-                                                  : Colors.white),
+                                            request['isFinish']
+                                                ? Icons.check_circle
+                                                : Icons.watch_later_outlined,
+                                            color: request['isFinish']
+                                                ? Colors.green
+                                                : Colors.white,
+                                          ),
                                           10.w,
-                                          Text(request['isFinish']
-                                              ? "Tamamlandı"
-                                              : "Yorum bekleniyor"),
+                                          Text(
+                                            request['isFinish']
+                                                ? "Tamamlandı"
+                                                : "Yorum bekleniyor",
+                                          ),
                                         ],
                                       ),
                                       ZodiacButton(
-                                          size: Size(100, 40),
-                                          onPressed: () =>
-                                              Get.to(() => RequestDetail(
-                                                    question:
-                                                        request['comment'],
-                                                    answer: request['reply'],
-                                                  )),
-                                          child: Text("Detay"))
+                                        size: Size(100, 40),
+                                        onPressed: () => Get.to(() => RequestDetail(
+                                              question: request['comment'],
+                                              answer: request['reply'],
+                                            )),
+                                        child: Text("Detay"),
+                                      ),
                                     ],
-                                  )
+                                  ),
                                 ],
                               ),
-                            )).paddingOnly(bottom: 10);
-                      },
-                    );
-                  }
-                },
+                            ),
+                          ).paddingOnly(bottom: 10);
+                        },
+                      );
+                    }
+                  },
+                ),
               ),
             ),
           ],

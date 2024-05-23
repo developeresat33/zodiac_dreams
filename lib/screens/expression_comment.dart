@@ -51,17 +51,28 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                                   crossAxisAlignment: CrossAxisAlignment
                                       .start, // Resmi üstte hizalar
                                   children: [
-                                    CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(expertName['img_url']),
-                                      radius: 30,
-                                    ).paddingOnly(top: 5),
+                                    Container(
+                                      height: 75,
+                                      width: 75,
+                                      child: Image.network(
+                                        expertName['img_url'],
+                                        fit: BoxFit.scaleDown,
+                                        loadingBuilder: (context, child,
+                                                loadingProgress) =>
+                                            loadingProgress == null
+                                                ? child
+                                                : Center(
+                                                    child:
+                                                        getLoading()),
+                                      ),
+                                    ),
                                     SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
+                                          8.h,
                                           Text(
                                             expertName['expert_name'] ?? '',
                                             style: TextStyle(

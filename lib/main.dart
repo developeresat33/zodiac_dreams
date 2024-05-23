@@ -65,8 +65,10 @@ class _MyAppState extends State<MyApp> {
           useMaterial3: true,
           fontFamily: GoogleFonts.openSans().fontFamily,
           brightness: Brightness.dark,
+      
+  
           colorScheme: ColorScheme.dark(
-            primary: Colors.blue[800]!,
+            primary: Colors.blue[600]!,
             onSecondary: Colors.white,
             onPrimary: Colors.white,
           ),

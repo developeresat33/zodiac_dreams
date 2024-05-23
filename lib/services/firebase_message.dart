@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class FirebaseMessagingHelper {
   static Future<void> initFirebaseMessaging() async {
@@ -10,7 +9,7 @@ class FirebaseMessagingHelper {
       print('Received a message while in the foreground!');
       print('Message data: ${message.data}');
       inspect(message);
-      GetMsg.showMsg('Message data: ${message.data}', option: 1);
+
       if (message.notification != null) {
         showNotification(message.notification);
         print('Message also contained a notification: ${message.notification}');

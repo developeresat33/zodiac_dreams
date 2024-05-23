@@ -71,7 +71,6 @@ class _ExpertSendState extends State<ExpertSend> {
                           Expanded(
                             child: ZodiacTextField(
                               controller: _requestController,
-                              maxLines: null,
                               hintText: "Rüyanızı yazınız",
                             ),
                           ),

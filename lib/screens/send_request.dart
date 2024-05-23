@@ -64,7 +64,6 @@ class _SendRequestState extends State<SendRequest> {
                           Expanded(
                             child: ZodiacTextField(
                               controller: _requestController,
-                              maxLines: null,
                               hintText: "Rüyanızı yazınız",
                             ),
                           ),
