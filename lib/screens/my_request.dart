@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
+import 'package:zodiac_star/screens/request_detail.dart';
 import 'package:zodiac_star/states/process_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
@@ -55,7 +56,8 @@ class _MyRequestState extends State<MyRequest> {
                             padding: EdgeInsets.all(10),
                             child: ListTile(
                               title: Text(
-                                  "Gönderilen Yorumcu :  ${request['receiveName']}"),
+                                      "Gönderilen Yorumcu :  ${request['receiveName']}")
+                                  .paddingOnly(bottom: 5),
                               subtitle: Column(
                                 children: [
                                   Row(
@@ -71,11 +73,32 @@ class _MyRequestState extends State<MyRequest> {
                                   ),
                                   10.h,
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                              request['isFinish']
+                                                  ? Icons.check_circle
+                                                  : Icons.watch_later_outlined,
+                                              color: request['isFinish']
+                                                  ? Colors.green
+                                                  : Colors.white),
+                                          10.w,
+                                          Text(request['isFinish']
+                                              ? "Tamamlandı"
+                                              : "Yorum bekleniyor"),
+                                        ],
+                                      ),
                                       ZodiacButton(
                                           size: Size(100, 40),
-                                          onPressed: () {},
+                                          onPressed: () =>
+                                              Get.to(() => RequestDetail(
+                                                    question:
+                                                        request['comment'],
+                                                    answer: request['reply'],
+                                                  )),
                                           child: Text("Detay"))
                                     ],
                                   )

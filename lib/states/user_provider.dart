@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,7 +13,7 @@ import 'package:zodiac_star/screens/home_page.dart';
 import 'package:zodiac_star/services/storage_manager.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
-import 'package:http/http.dart' as http;
+
 
 class UserProvider extends ChangeNotifier {
   bool? rememberMe = false;
@@ -206,37 +205,5 @@ class UserProvider extends ChangeNotifier {
       }
     }
     return result;
-  }
-
-  sendNotification() async {
-    http.post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
-        body: jsonEncode({
-          "to": "${userModel!.fcmToken}",
-          "content_available": true,
-          "apns-priority": "5",
-          "notification": {
-            "title": "Notification Title",
-            "body": "body body body body",
-            "sound": "none"
-          },
-          "data": {
-            "body": "Sigorta deneme",
-            "title": "Title",
-            "key_1": "50",
-            "key_2": "50",
-            "type": "auth",
-            "badge": "1"
-          },
-          "android": {"priority": "height", "ttl": "110"},
-          "apns": {
-            "headers": {"apns-priority": "5"}
-          },
-          "click_action": "FLUTTER_NOTIFICATION_CLICK"
-        }),
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          "Authorization":
-              "key=AAAAi5dUN7k:APA91bHu484HSosEfcIOUI00SOtBqV8usvqxS7hEruPnTad-Zb1p996iX3wV9ecDjGX6_YurZyXiFRWvsDL0vSe1tBcOouVDWz77M7W_2w8oHSQ2Lu6gPHYxDOctIDAkHvvcJg11eX9o"
-        });
   }
 }

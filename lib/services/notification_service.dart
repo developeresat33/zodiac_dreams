@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:zodiac_star/services/storage_manager.dart';
+import 'package:http/http.dart' as http;
 
 class CloudNotificationService {
   static CloudNotificationService? _cloudNotificationServiceInitialize;
@@ -9,7 +12,6 @@ class CloudNotificationService {
 
   static CloudNotificationService get cloudNotificationServiceInitialize {
     if (_cloudNotificationServiceInitialize == null) {
-
       _firebaseMessaging = FirebaseMessaging.instance;
       return _cloudNotificationServiceInitialize ??= CloudNotificationService();
     } else {
@@ -20,7 +22,6 @@ class CloudNotificationService {
   CloudNotificationService() {
     cloudMessagingInitVoid();
   }
-
 
   cloudMessagingInitVoid() async {
     _firebaseMessaging?.app.setAutomaticResourceManagementEnabled(true);
@@ -38,7 +39,8 @@ class CloudNotificationService {
     // a terminated state.
     _firebaseMessaging?.getInitialMessage().then((initialMessage) {
       debugPrint("---firebaseMessaging?.getInitialMessage()---");
-      if (initialMessage?.messageId != StorageManager.getString("notificationID")) {
+      if (initialMessage?.messageId !=
+          StorageManager.getString("notificationID")) {
         if (initialMessage != null) {
           debugPrint(initialMessage.data.toString());
           _handleMessage(initialMessage);
@@ -59,7 +61,8 @@ class CloudNotificationService {
       //AndroidNotification? android = message.notification?.android;
       //notificationModel.channelId! gelen bildirimleri channel id'lerine göre gösterilebilir
       //debugPrint(notificationModel.toJson().toString());
-      if (message.notification != null && (message.notification!.title ?? "").isNotEmpty) {
+      if (message.notification != null &&
+          (message.notification!.title ?? "").isNotEmpty) {
 /*         localService.showBigTextNotification(
           notificationID: message.notification.hashCode,
           title: message.notification!.title!,
@@ -84,5 +87,34 @@ class CloudNotificationService {
        }
       } */
     }
+  }
+
+  static void sendNotification(
+      String? title, String? body, String? token) async {
+    http.post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
+        body: jsonEncode({
+          "to": token,
+          "content_available": true,
+          "apns-priority": "5",
+          "notification": {"title": title, "body": body, "sound": "none"},
+          /*          "data": {
+            "body": "Sigorta deneme",
+            "title": "Title",
+            "key_1": "50",
+            "key_2": "50",
+            "type": "auth",
+            "badge": "1"
+          }, */
+          "android": {"priority": "height", "ttl": "110"},
+          "apns": {
+            "headers": {"apns-priority": "5"}
+          },
+          "click_action": "FLUTTER_NOTIFICATION_CLICK"
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "Authorization":
+              "key=AAAAi5dUN7k:APA91bHu484HSosEfcIOUI00SOtBqV8usvqxS7hEruPnTad-Zb1p996iX3wV9ecDjGX6_YurZyXiFRWvsDL0vSe1tBcOouVDWz77M7W_2w8oHSQ2Lu6gPHYxDOctIDAkHvvcJg11eX9o"
+        });
   }
 }

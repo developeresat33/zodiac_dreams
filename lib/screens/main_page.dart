@@ -23,13 +23,10 @@ class _MainPageState extends State<MainPage> {
                 15.h,
                 Row(
                   children: [
-                    GestureDetector(
-                      onTap: () => _.sendNotification(),
-                      child: Text(
-                        "Hoşgeldiniz ,${_.userModel!.nameSurname} ",
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 20),
-                      ),
+                    Text(
+                      "Hoşgeldiniz ,${_.userModel!.nameSurname} ",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 20),
                     ),
                   ],
                 ),

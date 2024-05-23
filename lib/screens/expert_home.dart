@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/screens/expert_login.dart';
+import 'package:zodiac_star/screens/expert_send.dart';
 import 'package:zodiac_star/states/process_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
@@ -37,7 +38,8 @@ class _ExpertHomeState extends State<ExpertHome> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBarWidget.getAppBar("Yorumcu Anasayfa",
+        appBar: AppBarWidget.getAppBar(
+          "Yorumcu Anasayfa",
           leading: IconButton(
             onPressed: () {
               Get.offAll(() => LoginExpert());
@@ -93,7 +95,13 @@ class _ExpertHomeState extends State<ExpertHome> {
                                     children: [
                                       ZodiacButton(
                                         size: Size(100, 40),
-                                        onPressed: () {},
+                                        onPressed: () => Get.to(() =>
+                                            ExpertSend(
+                                              request_id: request['request_id'],
+                                              user_name: request['senderName'],
+                                              user_nick: request['sender'],
+                                              dreamComment: request['comment'],
+                                            )),
                                         child: FittedBox(
                                           fit: BoxFit.scaleDown,
                                           child: Text("Cevapla"),

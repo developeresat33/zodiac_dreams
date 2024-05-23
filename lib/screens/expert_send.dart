@@ -10,17 +10,24 @@ import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
-class SendRequest extends StatefulWidget {
-  final String? master_nick;
-  final String? master_name;
+class ExpertSend extends StatefulWidget {
+  final int? request_id;
+  final String? user_name;
+  final String? user_nick;
+  final String? dreamComment;
 
-  const SendRequest({super.key, this.master_nick, this.master_name});
+  const ExpertSend(
+      {super.key,
+      this.request_id,
+      this.user_name,
+      this.dreamComment,
+      this.user_nick});
 
   @override
-  State<SendRequest> createState() => _SendRequestState();
+  State<ExpertSend> createState() => _ExpertSendState();
 }
 
-class _SendRequestState extends State<SendRequest> {
+class _ExpertSendState extends State<ExpertSend> {
   final TextEditingController _requestController = TextEditingController();
   bool hasSentRequest = false;
   String userRequest = '';
@@ -29,34 +36,34 @@ class _SendRequestState extends State<SendRequest> {
 
   @override
   void initState() {
-    _init();
-    super.initState();
-  }
-
-  _init() {
     proprop.requestModel = RequestModel(
-      receive: widget.master_nick,
-      receiveName: widget.master_name,
-      sender: userprop.userModel!.nick,
-      senderName: userprop.userModel!.nameSurname,
+      sender: widget.user_nick,
     );
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
         builder: (context, ProcessProvider _, child) => Scaffold(
-              appBar: AppBarWidget.getAppBar("Rüya Yorumu"),
+              appBar: AppBarWidget.getAppBar("Rüyayı Yorumla"),
               body: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    10.h,
-                    Text(
-                      "Lütfen rüyanızı anlaşılabilir bir biçimde tek seferde yazınız. Talep tek seferde oluşturulup mevcut taleplerim sayfanıza düşecektir. Uzman yorumcu yorumladıktan hemen sonra taleplerim sayfanızda ilgili talebinizden yorumu görüntüleyebilirsiniz.",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    10.h,
+                    Expanded(
+                        flex: 2,
+                        child: ListView(
+                          children: [
+                            10.h,
+                            Row(
+                              children: [
+                                Expanded(child: Text(widget.dreamComment!))
+                              ],
+                            ),
+                          ],
+                        )),
+                    20.h,
                     if (!hasSentRequest) ...[
                       Spacer(),
                       Row(
@@ -73,13 +80,14 @@ class _SendRequestState extends State<SendRequest> {
                             icon: Icon(Icons.send, color: Colors.white),
                             onPressed: () async {
                               if (_requestController.text.isNotEmpty) {
-                                await _.addRequest(_requestController.text);
+                                await _.replyRequest(_requestController.text,
+                                    widget.request_id!);
                                 setState(() {
                                   userRequest = _requestController.text;
                                   hasSentRequest = true;
                                 });
                               } else {
-                                GetMsg.showMsg("Lütfen rüyanızı yazınız",
+                                GetMsg.showMsg("Lütfen boş bırakmayınız",
                                     option: 0);
                               }
                             },
@@ -92,7 +100,7 @@ class _SendRequestState extends State<SendRequest> {
                         child: ListView(
                           children: [
                             Text(
-                              "Gönderdiğiniz Rüya Sorusu:",
+                              "Gönderdiğiniz Rüya Yorumu:",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -116,7 +124,7 @@ class _SendRequestState extends State<SendRequest> {
                           Expanded(
                               flex: 2,
                               child: Text(
-                                "Taleplerim sayfasından kontrol edebilirsiniz.",
+                                "Yorumunuz tamamlandı.",
                               )),
                           5.w,
                           Expanded(

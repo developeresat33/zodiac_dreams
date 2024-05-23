@@ -6,6 +6,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/data/request_model.dart';
 import 'package:zodiac_star/dbHelper/mongodb.dart';
+import 'package:zodiac_star/services/notification_service.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
@@ -24,7 +25,9 @@ class ProcessProvider extends ChangeNotifier {
     var userprop = Provider.of<UserProvider>(Get.context!, listen: false);
     log(userprop.expertModel!.expertUsername!.toString());
     return await MongoDatabase.requesDreamsCollection
-        .find(where.eq('receive', userprop.expertModel!.expertUsername))
+        .find(where
+            .eq('receive', userprop.expertModel!.expertUsername)
+            .eq('isFinish', false))
         .toList();
   }
 
@@ -46,8 +49,69 @@ class ProcessProvider extends ChangeNotifier {
       requestModel!.request_id = newRequestId;
 
       await MongoDatabase.requesDreamsCollection.insert(requestModel!.toJson());
+      await alertMaster();
       onLoading(true);
       GetMsg.showMsg("Talebiniz eklendi", option: 1);
+    } on Exception catch (e) {
+      GetMsg.showMsg(e.toString(), option: 0);
+      onLoading(true);
+      print(e.toString());
+    }
+  }
+
+  Future<void> alertMaster() async {
+    try {
+      var getToken = await MongoDatabase.expertAccountCollection
+          .find(where
+              .eq('expert_username', requestModel!.receive)
+              .fields(['fcmToken']))
+          .toList();
+
+      var fcmToken = getToken.first['fcmToken'];
+      CloudNotificationService.sendNotification(
+          "Uyarı", "Talep var.", fcmToken);
+    } on Exception catch (e) {
+      onLoading(true);
+      GetMsg.showMsg(e.toString(), option: 0);
+      print(e.toString());
+    }
+  }
+
+  Future<void> alertUser() async {
+    try {
+      var getToken = await MongoDatabase.userCollection
+          .find(where.eq('nick', requestModel!.sender).fields(['fcmToken']))
+          .toList();
+
+      var fcmToken = getToken.first['fcmToken'];
+      CloudNotificationService.sendNotification(
+          "Merhaba", "Talebiniz yorumlandı.", fcmToken);
+    } on Exception catch (e) {
+      onLoading(true);
+      GetMsg.showMsg(e.toString(), option: 0);
+      print(e.toString());
+    }
+  }
+
+  Future<void> replyRequest(String? comment, int id) async {
+    onLoading(false);
+    try {
+      var result = await MongoDatabase.requesDreamsCollection.updateOne(
+        where.eq('request_id', id),
+        modify.set('reply', comment).set('isFinish', true),
+      );
+
+      if (result.isAcknowledged) {
+        await alertUser();
+        onLoading(true);
+        GetMsg.showMsg("Tamamlandı", option: 1);
+      } else {
+        throw Exception("Güncelleme başarısız oldu");
+      }
+
+      onLoading(true);
+      GetMsg.showMsg("Yorum Gönderildi", option: 1);
+      getExpertRequest();
     } on Exception catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
       onLoading(true);

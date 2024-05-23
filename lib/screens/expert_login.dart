@@ -70,6 +70,7 @@ class _LoginExpertState extends State<LoginExpert> {
                               }
                               return null;
                             },
+                            onEditingComplete: () => _doLogin(_),
                           ))
                         ],
                       ),
@@ -81,17 +82,19 @@ class _LoginExpertState extends State<LoginExpert> {
                                   "Giriş Yap",
                                 ),
                                 onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    _.loginExpert();
-                                  } else {
-                                    GetMsg.showMsg(
-                                        "Zorunlu Alanları Doldurunuz",
-                                        option: 0);
-                                  }
+                                  _doLogin(_);
                                 }))
                       ])
                     ]).paddingSymmetric(horizontal: 20),
                   ),
                 ))));
+  }
+
+  void _doLogin(UserProvider _) {
+    if (_formKey.currentState!.validate()) {
+      _.loginExpert();
+    } else {
+      GetMsg.showMsg("Zorunlu Alanları Doldurunuz", option: 0);
+    }
   }
 }
