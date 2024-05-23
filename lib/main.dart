@@ -1,9 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:zodiac_star/dbHelper/mongodb.dart';
 import 'package:zodiac_star/screens/splash_screen.dart';
 import 'package:zodiac_star/states/expression_provider.dart';
 import 'package:zodiac_star/states/home_page_provider.dart';
@@ -15,9 +15,10 @@ import 'services/storage_manager.dart';
 
 FirebaseMessaging? messaging;
 bool? isRemind;
+bool? isExpert;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MongoDatabase.connect();
+  await Firebase.initializeApp();
   await StorageManager.initPrefs();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => ProcessProvider()),
@@ -37,6 +38,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
+    _init();
+
+    super.initState();
+  }
+
+  _init() async {
     try {
       if (StorageManager.getBool("isRemind") != null) {
         isRemind = StorageManager.getBool("isRemind");
@@ -47,8 +54,6 @@ class _MyAppState extends State<MyApp> {
       print(e);
       isRemind = false;
     }
-
-    super.initState();
   }
 
   @override
@@ -61,12 +66,12 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: [
         const Locale('tr', 'TR'),
       ],
+      locale: const Locale('tr', 'TR'),
+      
       theme: ThemeData(
           useMaterial3: true,
           fontFamily: GoogleFonts.openSans().fontFamily,
           brightness: Brightness.dark,
-      
-  
           colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
             onSecondary: Colors.white,

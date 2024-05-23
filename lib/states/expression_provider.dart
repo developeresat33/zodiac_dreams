@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mongo_dart/mongo_dart.dart';
-import 'package:zodiac_star/data/dream.dart';
+/* import 'package:mongo_dart/mongo_dart.dart';
+ */import 'package:zodiac_star/data/dream.dart';
 import 'package:zodiac_star/data/mini_items.dart';
-import 'package:zodiac_star/dbHelper/mongodb.dart';
+import 'package:zodiac_star/dbHelper/firebase.dart';
 
 class ExpressionProvider extends ChangeNotifier {
   int currentIndex = 0;
@@ -28,7 +28,7 @@ class ExpressionProvider extends ChangeNotifier {
       notifyListeners();
     });
 
-    var result = await MongoDatabase.dreamTitlesCollection
+/*     var result = await MongoDatabase.dreamTitlesCollection
         .find(where.eq('letter', letter))
         .toList();
 
@@ -38,7 +38,7 @@ class ExpressionProvider extends ChangeNotifier {
         allTitles!.add(title.toString());
         filteredTitles!.add(title.toString());
       }
-    }
+    } */
     isList = true;
 
     notifyListeners();
@@ -55,7 +55,7 @@ class ExpressionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Dream> getDreamByTitle(String title) async {
+/*   Future<Dream> getDreamByTitle(String title) async {
     var result = await MongoDatabase.dreamCollection
         .findOne(where.eq('dream_title', title));
     return Dream.fromJson(result);
@@ -63,5 +63,5 @@ class ExpressionProvider extends ChangeNotifier {
 
   Future<List<Map<String, dynamic>>> getExperts() async {
     return await MongoDatabase.expertCollection.find().toList();
-  }
+  } */
 }

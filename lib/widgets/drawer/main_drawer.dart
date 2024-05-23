@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/card_tile.dart';
+import 'package:zodiac_star/main.dart';
 import 'package:zodiac_star/screens/favorite_dreams.dart';
 import 'package:zodiac_star/screens/login_page.dart';
 import 'package:zodiac_star/screens/my_request.dart';
@@ -51,6 +52,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     title: Text("Çıkış Yap"),
                     trailing: Icon(Icons.chevron_right_outlined),
                     onTap: () {
+                      isExpert = null;
                       Get.offAll(() => LoginPage());
                     },
                   )

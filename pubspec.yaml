@@ -43,7 +43,7 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   flutter_staggered_animations: ^1.1.1
   flutter_localization: ^0.1.10
-  mongo_dart: ^0.10.2
+  #mongo_dart: ^0.10.2
   cherry_toast: ^1.10.1
   flutter_spinkit: ^5.2.1
   web_scraper: ^0.1.4
@@ -52,6 +52,7 @@ dependencies:
   firebase_messaging: ^14.9.2
   http: ^0.13.6
   flutter_local_notifications: ^17.1.2
+  flutter_dotenv: ^5.1.0
 
 
 dev_dependencies:
@@ -78,6 +79,7 @@ flutter:
   assets:
    - assets/   
    - assets/horoscope/
+   - .env
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

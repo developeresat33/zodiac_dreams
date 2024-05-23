@@ -62,9 +62,10 @@ class _PurchaseGemState extends State<PurchaseGem> {
                                         child: Container(
                                       alignment: Alignment.centerRight,
                                       child: Text(Functions.formatterPrice
-                                          .format(num.parse(MiniItems
-                                              .packageItems[index]
-                                              .packagePrice!))),
+                                          .format(double.parse(MiniItems
+                                                  .packageItems[index]
+                                                  .packagePrice ??
+                                              "0")).replaceAll("TRY", "")),
                                     ))
                                   ],
                                 ),

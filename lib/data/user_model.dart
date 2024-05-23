@@ -1,7 +1,7 @@
-import 'package:mongo_dart/mongo_dart.dart';
+/* import 'package:mongo_dart/mongo_dart.dart'; */
 
 class UserModel {
-  ObjectId? id;
+  dynamic uid;
   String? nick;
   String? nameSurname;
   String? age;
@@ -12,8 +12,8 @@ class UserModel {
   String? fcmToken;
 
   UserModel(
-      {this.id,
-      this.nick,
+      {this.nick,
+      this.uid,
       this.nameSurname,
       this.age,
       this.birthDate,
@@ -32,13 +32,15 @@ class UserModel {
     data['password'] = this.password;
     data['gem'] = this.gem;
     data['fcmToken'] = this.fcmToken;
+    data['uid'] = this.uid;
+
     return data;
   }
 
   static UserModel parseRegisterModelFromDocument(
       Map<String, dynamic> document) {
     return UserModel(
-      id: document['_id'],
+      uid: document['uid'],
       nick: document['nick'],
       nameSurname: document['nameSurname'],
       age: document['age'],

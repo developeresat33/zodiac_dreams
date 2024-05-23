@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/common_widgets/zodiac_textfield.dart';
+import 'package:zodiac_star/screens/login_page.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
@@ -34,7 +35,10 @@ class _LoginExpertState extends State<LoginExpert> {
     return SafeArea(
         child: Consumer(
             builder: (context, UserProvider _, child) => Scaffold(
-                appBar: AppBarWidget.getAppBar("Yorumcu Giriş Paneli"),
+                appBar: AppBarWidget.getAppBar("Yorumcu Giriş Paneli",
+                    leading: IconButton(
+                        onPressed: () => Get.offAll(() => LoginPage()),
+                        icon: Icon(Icons.home))),
                 resizeToAvoidBottomInset: true,
                 body: SingleChildScrollView(
                   child: Form(
@@ -74,7 +78,7 @@ class _LoginExpertState extends State<LoginExpert> {
                           ))
                         ],
                       ),
-                      10.h,
+                      20.h,
                       Row(children: [
                         Expanded(
                             child: ZodiacButton(

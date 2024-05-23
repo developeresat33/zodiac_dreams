@@ -1,12 +1,11 @@
-import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mongo_dart/mongo_dart.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:zodiac_star/controller/register_controller.dart';
 import 'package:zodiac_star/data/expert_model.dart';
 import 'package:zodiac_star/data/user_model.dart';
-import 'package:zodiac_star/dbHelper/mongodb.dart';
+import 'package:zodiac_star/dbHelper/firebase.dart';
 import 'package:zodiac_star/main.dart';
 import 'package:zodiac_star/screens/expert_home.dart';
 import 'package:zodiac_star/screens/home_page.dart';
@@ -14,8 +13,8 @@ import 'package:zodiac_star/services/storage_manager.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
-
 class UserProvider extends ChangeNotifier {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool? rememberMe = false;
   RegisterController? registerController = RegisterController();
   UserModel? registerModel, userModel;
@@ -58,31 +57,45 @@ class UserProvider extends ChangeNotifier {
     return result;
   }
 
-  void saveUser() async {
+  Future<void> saveUser() async {
     onLoading(false);
 
     try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('nick', isEqualTo: registerModel!.nick)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        onLoading(true);
+        GetMsg.showMsg(
+          "Bu kullanıcı adı zaten kayıtlı. Lütfen başka bir kullanıcı adı giriniz.",
+          option: 0,
+        );
+        return;
+      }
+
       String? fcmToken = await messaging!.getToken();
       print(fcmToken);
       registerModel!.fcmToken = fcmToken;
 
-      bool userExists = await checkUserExistsInMongoDB(registerModel!.nick!);
+      DocumentReference docRef =
+          await _firestore.collection('users').add(registerModel!.toJson());
 
-      if (userExists) {
-        onLoading(true);
-        GetMsg.showMsg(
-            "Bu kullanıcı zaten kayıtlı.Lütfen başka bir kullanıcı adı giriniz.",
-            option: 0);
-      } else {
-        await MongoDatabase.userCollection.save(registerModel!.toJson());
+      registerModel!.uid = docRef.id;
+      await docRef.update({'uid': docRef.id});
 
-        GetMsg.showMsg("Kayıt başarıyla tamamlandı.", option: 1);
-        userModel = registerModel;
-        onLoading(true);
-        Get.offAll(() => HomePage());
-      }
+      GetMsg.showMsg("Kayıt başarıyla tamamlandı.", option: 1);
+
+      userModel = registerModel;
+
+      onLoading(true);
+
+      Get.offAll(() => HomePage());
     } catch (e) {
       onLoading(true);
+
+      // Hata mesajı göster
       GetMsg.showMsg(
         "Kayıt işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
         option: 0,
@@ -90,100 +103,152 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> checkUserExistsInMongoDB(String nick) async {
-    final collection = MongoDatabase.userCollection;
+  Future<void> saveExpert() async {
+    try {
+      final data = {
+        "expert_username": "asya33",
+        "expert_name": "Asya",
+        "expert_pw": "asya3.3",
+        "fcmToken": "",
+        "uid": ""
+      };
 
-    var query = where.eq('nick', nick);
+      DocumentReference docRef =
+          await _firestore.collection("expert_account").add(data);
 
-    var result = await collection.findOne(query);
+      // UID'yi belgeye ekleyin
+      data['uid'] = docRef.id;
 
-    return result != null;
+      // UID'yi belgeye güncelleyin
+      await docRef.update({'uid': docRef.id});
+
+      print('Belge başarıyla eklendi. Document ID: ${docRef.id}');
+    } catch (e) {
+      print('Belge eklenirken bir hata oluştu: $e');
+    }
   }
 
-  loginUser() async {
+  Future<void> loginUser() async {
     userModel = UserModel();
     onLoading(false);
-    await MongoDatabase.userCollection.findOne({
-      'nick': nickCt!.text,
-      'password': passwordCt!.text,
-    }).then((value) async {
-      if (value != null) {
-        if (value['password'] == passwordCt!.text) {
+
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('nick', isEqualTo: nickCt!.text)
+          .where('password', isEqualTo: passwordCt!.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        if (userDoc['password'] == passwordCt!.text) {
           String? fcmToken = await messaging!.getToken();
 
-          await MongoDatabase.userCollection.updateOne(
-            where.eq('nick', nickCt!.text),
-            modify.set('fcmToken', fcmToken),
-          );
+          await _firestore.collection('users').doc(userDoc.id).update({
+            'fcmToken': fcmToken,
+          });
 
-          onLoading(true);
-          userModel = UserModel.parseRegisterModelFromDocument(value);
+          userModel = UserModel.parseRegisterModelFromDocument(
+              userDoc.data() as Map<String, dynamic>);
           userModel!.fcmToken = fcmToken;
+
           if (rememberMe!) {
             StorageManager.setString("id", nickCt!.text);
             StorageManager.setString("pw", passwordCt!.text);
             StorageManager.setBool("remind", true);
           }
+
+          isExpert = false;
+          onLoading(true);
           Get.offAll(() => HomePage());
         } else {
           onLoading(true);
-          GetMsg.showMsg("Hatalı sifre.", option: 0);
+          GetMsg.showMsg("Hatalı şifre.", option: 0);
         }
       } else {
         onLoading(true);
         GetMsg.showMsg("Kullanıcı bulunamadı.", option: 0);
       }
-    });
+    } catch (e) {
+      onLoading(true);
+      GetMsg.showMsg(
+        "Giriş işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
+        option: 0,
+      );
+    }
   }
 
-  loginExpert() async {
+  Future<void> loginExpert() async {
     expertModel = ExpertModel();
     onLoading(false);
-    await MongoDatabase.expertAccountCollection.findOne({
-      'expert_username': expertNickCt!.text,
-      'expert_pw': expertPasswordCt!.text,
-    }).then((value) async {
-      inspect(value);
-      if (value != null) {
-        if (value['expert_pw'] == expertPasswordCt!.text) {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('expert_account')
+          .where('expert_username', isEqualTo: expertNickCt!.text)
+          .where('expert_pw', isEqualTo: expertPasswordCt!.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot expertDoc = querySnapshot.docs.first;
+
+        if (expertDoc['expert_pw'] == expertPasswordCt!.text) {
           String? fcmToken = await messaging!.getToken();
-          print(fcmToken);
-          await MongoDatabase.expertAccountCollection.updateOne(
-            where.eq('expert_username', expertNickCt!.text),
-            modify.set('fcmToken', fcmToken),
-          );
+
+          await _firestore
+              .collection('expert_account')
+              .doc(expertDoc.id)
+              .update({
+            'fcmToken': fcmToken,
+          });
+
+          expertModel = ExpertModel.parseRegisterModelFromDocument(
+              expertDoc.data() as Map<String, dynamic>);
+          expertModel!.fcmToken = fcmToken;
 
           onLoading(true);
-          expertModel = ExpertModel.parseRegisterModelFromDocument(value);
-          expertModel!.fcmToken = fcmToken;
-          inspect(expertModel);
-/*           if (rememberMe!) {
-            StorageManager.setString("id", nickCt!.text);
-            StorageManager.setString("pw", passwordCt!.text);
-            StorageManager.setBool("remind", true);
-          } */
           Get.offAll(() => ExpertHome());
         } else {
           onLoading(true);
-          GetMsg.showMsg("Hatalı sifre.", option: 0);
+          GetMsg.showMsg("Hatalı şifre.", option: 0);
         }
       } else {
         onLoading(true);
         GetMsg.showMsg("Kullanıcı bulunamadı.", option: 0);
       }
-    });
+    } catch (e) {
+      onLoading(true);
+      GetMsg.showMsg(
+        "Giriş işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
+        option: 0,
+      );
+    }
   }
 
-  saveFavoriteDream() async {
-    var result = await MongoDatabase.favCollection.insertOne(
-        {'user_id': userModel!.id!, 'text': 'Rüyada beyaz yılan görmek'});
-    print(result);
-  }
+  Future<void> addFavoriteDream(String dreamTitle) async {
+    onLoading(false);
 
-  Future<List<Map<String, dynamic>>> getFavoriteDreams() async {
-    return await MongoDatabase.favCollection
-        .find(where.eq('user_id', userModel!.id))
-        .toList();
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userModel!.uid)
+          .collection(FirebaseConstant.favDreamCollection)
+          .add({
+        'user_uid': userModel!.uid,
+        'dream_title': dreamTitle,
+      });
+
+      GetMsg.showMsg("Favori rüya başarıyla eklendi.", option: 1);
+
+      onLoading(true);
+    } catch (e) {
+      onLoading(true);
+
+      GetMsg.showMsg(
+        "Favori rüya ekleme işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
+        option: 0,
+      );
+    }
   }
 
   Future<List<Map<String, String>>> fetchData() async {

@@ -6,6 +6,6 @@ class Functions {
   static final NumberFormat formatterPrice = NumberFormat.currency(
     customPattern: '#,##0.00 ₺',
     locale: 'tr_TR',
-    symbol: "",
+    symbol: "₺",
   );
 }

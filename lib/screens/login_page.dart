@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +8,6 @@ import 'package:zodiac_star/main.dart';
 import 'package:zodiac_star/screens/expert_login.dart';
 import 'package:zodiac_star/screens/register_page.dart';
 import 'package:zodiac_star/services/firebase_message.dart';
-import 'package:zodiac_star/services/notification_permission.dart';
 import 'package:zodiac_star/services/storage_manager.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
@@ -32,10 +30,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _init() async {
-    await Firebase.initializeApp();
-    await CheckNotificationPermission.instance.checkPermission();
     messaging = FirebaseMessaging.instance;
+    await messaging!.requestPermission(
+      alert: true,
+      announcement: true,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: true,
+      sound: true,
+    );
     await FirebaseMessagingHelper.initFirebaseMessaging();
+
     userprop.rememberMe = StorageManager.getBool("remind");
 
     if (userprop.rememberMe == true) {
@@ -240,6 +246,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       StorageManager.setBool("isRemind", _.rememberMe!);
       _.loginUser();
+      /*   _.saveExpert(); */
     } else {
       GetMsg.showMsg("Zorunlu alanları doldurunuz.", option: 0);
     }

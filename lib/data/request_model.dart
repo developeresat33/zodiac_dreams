@@ -1,6 +1,8 @@
 class RequestModel {
   String? receiveName;
-  int? request_id;
+  String? request_uid;
+  String? sender_uid;
+  String? receive_uid;
   String? sender;
   String? senderName;
   String? receive;
@@ -9,7 +11,9 @@ class RequestModel {
   bool? isFinish;
   RequestModel({
     this.receiveName,
-    this.request_id,
+    this.request_uid,
+    this.sender_uid,
+    this.receive_uid,
     this.sender,
     this.senderName,
     this.receive,
@@ -20,13 +24,15 @@ class RequestModel {
   Map<String, dynamic> toJson() {
     return {
       'receiveName': receiveName,
-      'request_id': request_id,
       'sender': sender,
       'senderName': senderName,
       'receive': receive,
       'comment': comment,
       'reply': reply,
-      'isFinish': isFinish
+      'isFinish': isFinish,
+      'sender_uid': sender_uid,
+      'receive_uid': receive_uid,
+      'request_uid': request_uid
     };
   }
 }

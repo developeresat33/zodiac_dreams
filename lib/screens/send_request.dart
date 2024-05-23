@@ -11,10 +11,12 @@ import 'package:zodiac_star/widgets/ui/app_bar.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class SendRequest extends StatefulWidget {
+  final String? master_uid;
   final String? master_nick;
   final String? master_name;
 
-  const SendRequest({super.key, this.master_nick, this.master_name});
+  const SendRequest(
+      {super.key, this.master_nick, this.master_name, this.master_uid});
 
   @override
   State<SendRequest> createState() => _SendRequestState();
@@ -29,12 +31,15 @@ class _SendRequestState extends State<SendRequest> {
 
   @override
   void initState() {
+    print("USER UID" + userprop.userModel!.uid.toString());
     _init();
     super.initState();
   }
 
   _init() {
     proprop.requestModel = RequestModel(
+      sender_uid: userprop.userModel!.uid,
+      receive_uid: widget.master_uid,
       receive: widget.master_nick,
       receiveName: widget.master_name,
       sender: userprop.userModel!.nick,
@@ -72,7 +77,9 @@ class _SendRequestState extends State<SendRequest> {
                             icon: Icon(Icons.send, color: Colors.white),
                             onPressed: () async {
                               if (_requestController.text.isNotEmpty) {
-                                await _.addRequest(_requestController.text);
+                                await _.addRequest(
+                                  _requestController.text,
+                                );
                                 setState(() {
                                   userRequest = _requestController.text;
                                   hasSentRequest = true;

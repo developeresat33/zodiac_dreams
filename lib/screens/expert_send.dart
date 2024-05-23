@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/common_widgets/zodiac_textfield.dart';
 import 'package:zodiac_star/data/request_model.dart';
@@ -11,17 +12,20 @@ import 'package:zodiac_star/widgets/ui/app_bar.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class ExpertSend extends StatefulWidget {
-  final int? request_id;
-  final String? user_name;
+  final String? request_uid;
+  final String? user_uid;
   final String? user_nick;
+  final String? user_name;
   final String? dreamComment;
 
-  const ExpertSend(
-      {super.key,
-      this.request_id,
-      this.user_name,
-      this.dreamComment,
-      this.user_nick});
+  const ExpertSend({
+    super.key,
+    required this.user_uid,
+    required this.user_nick,
+    required this.user_name,
+    required this.dreamComment,
+    required this.request_uid,
+  });
 
   @override
   State<ExpertSend> createState() => _ExpertSendState();
@@ -36,8 +40,15 @@ class _ExpertSendState extends State<ExpertSend> {
 
   @override
   void initState() {
+    print("REQUEST ID" + widget.request_uid.toString());
     proprop.requestModel = RequestModel(
+      sender_uid: widget.user_uid,
+      receive_uid: userprop.expertModel!.uid,
+      receive: userprop.expertModel!.expertUsername,
+      receiveName: userprop.expertModel!.expertUsername,
       sender: widget.user_nick,
+      senderName: widget.user_name,
+      request_uid: widget.request_uid,
     );
     super.initState();
   }
@@ -79,8 +90,9 @@ class _ExpertSendState extends State<ExpertSend> {
                             icon: Icon(Icons.send, color: Colors.white),
                             onPressed: () async {
                               if (_requestController.text.isNotEmpty) {
-                                await _.replyRequest(_requestController.text,
-                                    widget.request_id!);
+                                await _.replyRequest(
+                                  _requestController.text,
+                                );
                                 setState(() {
                                   userRequest = _requestController.text;
                                   hasSentRequest = true;

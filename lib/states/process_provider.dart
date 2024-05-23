@@ -1,58 +1,44 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:mongo_dart/mongo_dart.dart';
-import 'package:provider/provider.dart';
 import 'package:zodiac_star/data/request_model.dart';
-import 'package:zodiac_star/dbHelper/mongodb.dart';
+import 'package:zodiac_star/dbHelper/firebase.dart';
 import 'package:zodiac_star/services/notification_service.dart';
-import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class ProcessProvider extends ChangeNotifier {
   RequestModel? requestModel;
+  bool? isList = true;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<Map<String, dynamic>>> getMyRequest() async {
-    var userprop = Provider.of<UserProvider>(Get.context!, listen: false);
-    return await MongoDatabase.requesDreamsCollection
-        .find(where.eq('sender', userprop.userModel!.nick))
-        .toList();
-  }
-
-  Future<List<Map<String, dynamic>>> getExpertRequest() async {
-    var userprop = Provider.of<UserProvider>(Get.context!, listen: false);
-    log(userprop.expertModel!.expertUsername!.toString());
-    return await MongoDatabase.requesDreamsCollection
-        .find(where
-            .eq('receive', userprop.expertModel!.expertUsername)
-            .eq('isFinish', false))
-        .toList();
-  }
-
-  Future<void> addRequest(String? comment) async {
+  Future<void> addRequest(
+    String? comment,
+  ) async {
     onLoading(false);
     try {
       requestModel!.comment = comment;
-      requestModel!.reply = '';
+      requestModel!.reply = "";
 
-      final maxRequestIdDocument = await MongoDatabase.requesDreamsCollection
-          .find(where.sortBy('request_id', descending: true).limit(1))
-          .toList();
+      DocumentReference senderDocRef = await _firestore
+          .collection('users')
+          .doc(requestModel!.sender_uid!)
+          .collection(FirebaseConstant.dreamRequestCollection)
+          .add(requestModel!.toJson());
 
-      int newRequestId = 1;
-      if (maxRequestIdDocument.isNotEmpty) {
-        newRequestId = maxRequestIdDocument.first['request_id'] + 1;
-      }
+      DocumentReference expertDocRef = await _firestore
+          .collection('expert_account')
+          .doc(requestModel!.receive_uid!)
+          .collection(FirebaseConstant.dreamRequestCollection)
+          .add(requestModel!.toJson());
 
-      requestModel!.request_id = newRequestId;
-
-      await MongoDatabase.requesDreamsCollection.insert(requestModel!.toJson());
+      await senderDocRef.update({'request_uid': senderDocRef.id});
+      await expertDocRef.update({'request_uid': senderDocRef.id});
       await alertMaster();
       onLoading(true);
       GetMsg.showMsg("Talebiniz eklendi", option: 1);
-    } on Exception catch (e) {
+    } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
       onLoading(true);
       print(e.toString());
@@ -61,61 +47,97 @@ class ProcessProvider extends ChangeNotifier {
 
   Future<void> alertMaster() async {
     try {
-      var getToken = await MongoDatabase.expertAccountCollection
-          .find(where
-              .eq('expert_username', requestModel!.receive)
-              .fields(['fcmToken']))
-          .toList();
+      DocumentSnapshot expertSnapshot = await _firestore
+          .collection('expert_account')
+          .where('uid', isEqualTo: requestModel!.receive_uid)
+          .limit(1)
+          .get()
+          .then((snapshot) => snapshot.docs.first);
 
-      var fcmToken = getToken.first['fcmToken'];
+      var fcmToken = expertSnapshot.get('fcmToken');
+
       CloudNotificationService.sendNotification(
-          "Uyarı", "Talep var.", fcmToken);
-    } on Exception catch (e) {
-      onLoading(true);
+        "Uyarı",
+        "Talep var.",
+        fcmToken,
+      );
+    } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
+      onLoading(true);
       print(e.toString());
     }
   }
 
   Future<void> alertUser() async {
     try {
-      var getToken = await MongoDatabase.userCollection
-          .find(where.eq('nick', requestModel!.sender).fields(['fcmToken']))
-          .toList();
+      DocumentSnapshot userSnapshot = await _firestore
+          .collection('users')
+          .where('uid', isEqualTo: requestModel!.sender_uid)
+          .limit(1)
+          .get()
+          .then((snapshot) => snapshot.docs.first);
 
-      var fcmToken = getToken.first['fcmToken'];
+      var fcmToken = userSnapshot.get('fcmToken');
+
       CloudNotificationService.sendNotification(
-          "Merhaba", "Talebiniz yorumlandı.", fcmToken);
-    } on Exception catch (e) {
-      onLoading(true);
+        "Uyarı",
+        "Talebiniz yorumlandı.",
+        fcmToken,
+      );
+    } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
+      onLoading(true);
       print(e.toString());
     }
   }
 
-  Future<void> replyRequest(String? comment, int id) async {
+  Future<void> replyRequest(
+    String? comment,
+  ) async {
     onLoading(false);
-    try {
-      var result = await MongoDatabase.requesDreamsCollection.updateOne(
-        where.eq('request_id', id),
-        modify.set('reply', comment).set('isFinish', true),
-      );
 
-      if (result.isAcknowledged) {
-        await alertUser();
-        onLoading(true);
-        GetMsg.showMsg("Tamamlandı", option: 1);
-      } else {
-        throw Exception("Güncelleme başarısız oldu");
+    inspect(requestModel);
+
+    try {
+      QuerySnapshot querySnapshotUser = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(requestModel!.sender_uid)
+          .collection('dreamRequests')
+          .where('request_uid', isEqualTo: requestModel!.request_uid)
+          .get();
+
+      QuerySnapshot querySnapshotExpert = await FirebaseFirestore.instance
+          .collection('expert_account')
+          .doc(requestModel!.receive_uid)
+          .collection('dreamRequests')
+          .where('request_uid', isEqualTo: requestModel!.request_uid)
+          .get();
+
+      if (querySnapshotUser.docs.isNotEmpty) {
+        var doc = querySnapshotUser.docs.first;
+
+        await doc.reference.update({
+          'isFinish': true,
+          'reply': comment,
+        });
       }
 
+      if (querySnapshotExpert.docs.isNotEmpty) {
+        var doc = querySnapshotExpert.docs.first;
+
+        await doc.reference.update({
+          'isFinish': true,
+          'reply': comment,
+        });
+      }
+      await alertUser();
+      GetMsg.showMsg("Yorum gönderildi.", option: 1);
+
       onLoading(true);
-      GetMsg.showMsg("Yorum Gönderildi", option: 1);
-      getExpertRequest();
-    } on Exception catch (e) {
+    } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
+
       onLoading(true);
-      print(e.toString());
     }
   }
 }
