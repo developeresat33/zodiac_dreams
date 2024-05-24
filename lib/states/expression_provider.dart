@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 /* import 'package:mongo_dart/mongo_dart.dart';
  */import 'package:zodiac_star/data/dream.dart';
 import 'package:zodiac_star/data/mini_items.dart';
-import 'package:zodiac_star/dbHelper/firebase.dart';
 
 class ExpressionProvider extends ChangeNotifier {
   int currentIndex = 0;

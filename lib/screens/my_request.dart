@@ -6,6 +6,7 @@ import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/dbHelper/firebase.dart';
 import 'package:zodiac_star/screens/request_detail.dart';
 import 'package:zodiac_star/states/user_provider.dart';
+import 'package:zodiac_star/utils/functions.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
@@ -55,6 +56,8 @@ class _MyRequestState extends State<MyRequest> {
                               itemCount: myRequests.length,
                               itemBuilder: (context, index) {
                                 var request = myRequests[index];
+                                print(Functions.formatTimestamp(
+                                    request['created_at']));
                                 return Container(
                                   decoration: BoxDecoration(
                                     color: Color.fromRGBO(30, 33, 37, 1),
@@ -75,6 +78,18 @@ class _MyRequestState extends State<MyRequest> {
                                                 maxLines: 3,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
+                                            ),
+                                          ],
+                                        ),
+                                        5.h,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              Functions.formatTimestamp(
+                                                  request['created_at']),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
                                         ),

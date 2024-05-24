@@ -90,21 +90,14 @@ class CloudNotificationService {
   }
 
   static void sendNotification(
-      String? title, String? body, String? token) async {
+      String? title, String? body, String? token, bool? isExpert) async {
     http.post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
         body: jsonEncode({
           "to": token,
           "content_available": true,
           "apns-priority": "5",
           "notification": {"title": title, "body": body, "sound": "none"},
-          /*          "data": {
-            "body": "Sigorta deneme",
-            "title": "Title",
-            "key_1": "50",
-            "key_2": "50",
-            "type": "auth",
-            "badge": "1"
-          }, */
+          "data": {"isExpert": isExpert},
           "android": {"priority": "height", "ttl": "110"},
           "apns": {
             "headers": {"apns-priority": "5"}

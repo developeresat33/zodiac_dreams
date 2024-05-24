@@ -16,6 +16,7 @@ import 'services/storage_manager.dart';
 FirebaseMessaging? messaging;
 bool? isRemind;
 bool? isExpert;
+int autoLogin = 0;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -67,7 +68,6 @@ class _MyAppState extends State<MyApp> {
         const Locale('tr', 'TR'),
       ],
       locale: const Locale('tr', 'TR'),
-      
       theme: ThemeData(
           useMaterial3: true,
           fontFamily: GoogleFonts.openSans().fontFamily,

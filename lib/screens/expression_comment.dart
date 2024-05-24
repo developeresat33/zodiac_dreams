@@ -64,13 +64,31 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                             Container(
                               height: 75,
                               width: 75,
-                              child: Image.network(
-                                expert['img_url'],
-                                fit: BoxFit.scaleDown,
-                                loadingBuilder: (context, child, loadingProgress) =>
-                                    loadingProgress == null
-                                        ? child
-                                        : Center(child: getLoading()),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    height: 75,
+                                    width: 75,
+                                    child: Center(
+                                      child: Icon(Icons.person_search_sharp),
+                                    ),
+                                  ),
+                                  Column(
+                                    children: [
+                                      Expanded(
+                                        child: Image.network(
+                                          expert['img_url'],
+                                          fit: BoxFit.scaleDown,
+                                          loadingBuilder: (context, child,
+                                                  loadingProgress) =>
+                                              loadingProgress == null
+                                                  ? child
+                                                  : Center(child: getLoading()),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                             SizedBox(width: 10),
@@ -125,11 +143,13 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                                       ZodiacButton(
                                         size: Size(100, 40),
                                         onPressed: () {
-                                        Get.to(() => SendRequest(
+                                          Get.to(() => SendRequest(
                                                 master_uid: expert['uid'],
-                                                master_name: expert['expert_name'],
-                                                master_nick: expert['expert_username'],
-                                              )); 
+                                                master_name:
+                                                    expert['expert_name'],
+                                                master_nick:
+                                                    expert['expert_username'],
+                                              ));
                                         },
                                         child: Text("Başlat"),
                                       )

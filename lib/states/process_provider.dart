@@ -20,15 +20,16 @@ class ProcessProvider extends ChangeNotifier {
     try {
       requestModel!.comment = comment;
       requestModel!.reply = "";
+      requestModel!.created_at = DateTime.now();
 
       DocumentReference senderDocRef = await _firestore
-          .collection('users')
+          .collection(FirebaseConstant.userCollection)
           .doc(requestModel!.sender_uid!)
           .collection(FirebaseConstant.dreamRequestCollection)
           .add(requestModel!.toJson());
 
       DocumentReference expertDocRef = await _firestore
-          .collection('expert_account')
+          .collection(FirebaseConstant.expertAccountCollection)
           .doc(requestModel!.receive_uid!)
           .collection(FirebaseConstant.dreamRequestCollection)
           .add(requestModel!.toJson());
@@ -57,10 +58,7 @@ class ProcessProvider extends ChangeNotifier {
       var fcmToken = expertSnapshot.get('fcmToken');
 
       CloudNotificationService.sendNotification(
-        "Uyarı",
-        "Talep var.",
-        fcmToken,
-      );
+          "Uyarı", "Talep var.", fcmToken, true);
     } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
       onLoading(true);
@@ -80,10 +78,7 @@ class ProcessProvider extends ChangeNotifier {
       var fcmToken = userSnapshot.get('fcmToken');
 
       CloudNotificationService.sendNotification(
-        "Uyarı",
-        "Talebiniz yorumlandı.",
-        fcmToken,
-      );
+          "Uyarı", "Talebiniz yorumlandı.", fcmToken, false);
     } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
       onLoading(true);
@@ -100,16 +95,16 @@ class ProcessProvider extends ChangeNotifier {
 
     try {
       QuerySnapshot querySnapshotUser = await FirebaseFirestore.instance
-          .collection('users')
+          .collection(FirebaseConstant.userCollection)
           .doc(requestModel!.sender_uid)
-          .collection('dreamRequests')
+          .collection(FirebaseConstant.dreamRequestCollection)
           .where('request_uid', isEqualTo: requestModel!.request_uid)
           .get();
 
       QuerySnapshot querySnapshotExpert = await FirebaseFirestore.instance
-          .collection('expert_account')
+          .collection(FirebaseConstant.expertAccountCollection)
           .doc(requestModel!.receive_uid)
-          .collection('dreamRequests')
+          .collection(FirebaseConstant.dreamRequestCollection)
           .where('request_uid', isEqualTo: requestModel!.request_uid)
           .get();
 

@@ -62,7 +62,7 @@ class UserProvider extends ChangeNotifier {
 
     try {
       QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
+          .collection(FirebaseConstant.userCollection)
           .where('nick', isEqualTo: registerModel!.nick)
           .get();
 
@@ -114,7 +114,7 @@ class UserProvider extends ChangeNotifier {
       };
 
       DocumentReference docRef =
-          await _firestore.collection("expert_account").add(data);
+          await _firestore.collection(FirebaseConstant.expertAccountCollection).add(data);
 
       // UID'yi belgeye ekleyin
       data['uid'] = docRef.id;
@@ -134,7 +134,7 @@ class UserProvider extends ChangeNotifier {
 
     try {
       QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
+          .collection(FirebaseConstant.userCollection)
           .where('nick', isEqualTo: nickCt!.text)
           .where('password', isEqualTo: passwordCt!.text)
           .get();
@@ -145,7 +145,10 @@ class UserProvider extends ChangeNotifier {
         if (userDoc['password'] == passwordCt!.text) {
           String? fcmToken = await messaging!.getToken();
 
-          await _firestore.collection('users').doc(userDoc.id).update({
+          await _firestore
+              .collection(FirebaseConstant.userCollection)
+              .doc(userDoc.id)
+              .update({
             'fcmToken': fcmToken,
           });
 
@@ -184,7 +187,7 @@ class UserProvider extends ChangeNotifier {
     onLoading(false);
     try {
       QuerySnapshot querySnapshot = await _firestore
-          .collection('expert_account')
+          .collection(FirebaseConstant.expertAccountCollection)
           .where('expert_username', isEqualTo: expertNickCt!.text)
           .where('expert_pw', isEqualTo: expertPasswordCt!.text)
           .get();
@@ -196,7 +199,7 @@ class UserProvider extends ChangeNotifier {
           String? fcmToken = await messaging!.getToken();
 
           await _firestore
-              .collection('expert_account')
+              .collection(FirebaseConstant.expertAccountCollection)
               .doc(expertDoc.id)
               .update({
             'fcmToken': fcmToken,
@@ -230,7 +233,7 @@ class UserProvider extends ChangeNotifier {
 
     try {
       await _firestore
-          .collection('users')
+          .collection(FirebaseConstant.userCollection)
           .doc(userModel!.uid)
           .collection(FirebaseConstant.favDreamCollection)
           .add({

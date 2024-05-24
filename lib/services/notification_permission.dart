@@ -41,27 +41,6 @@ class CheckNotificationPermission {
       sceneListener?.cancel();
       return Future<bool>.value(true);
     } else {
-/*         sceneListener ??=
-            LifeCycleObserver().lifeCycleObserver.listen((value) async {
-          if (value == AppLifecycleState.resumed) {
-            bool value = await Permission.notification.isGranted;
-            if (value == true) {
-              sceneListener?.cancel();
-              Get.close(1);
-            }
-          }
-        });
-        DialogService.instance.showCustomDialog(
-            "user.notification.content".translateMap(),
-            isSuccess: false,
-            dismissible: false,
-            alignment: Alignment.topCenter,
-            secondButtonText: "user.common.btn_settings".translateMap(),
-            secondButton: () {
-          AppSettings.openAppSettings(type: AppSettingsType.notification,asAnotherTask: true)
-              .then((value) {
-          });
-        }); */
       return Future<bool>.value(false);
     }
   }

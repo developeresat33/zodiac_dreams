@@ -6,6 +6,7 @@ import 'package:zodiac_star/dbHelper/firebase.dart';
 import 'package:zodiac_star/screens/expert_login.dart';
 import 'package:zodiac_star/screens/expert_send.dart';
 import 'package:zodiac_star/states/user_provider.dart';
+import 'package:zodiac_star/utils/functions.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
@@ -88,7 +89,18 @@ class _ExpertHomeState extends State<ExpertHome> {
                                           maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        SizedBox(height: 10),
+                                        5.h,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              Functions.formatTimestamp(
+                                                  request['created_at']),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,

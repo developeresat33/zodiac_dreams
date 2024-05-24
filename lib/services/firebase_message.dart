@@ -11,13 +11,14 @@ class FirebaseMessagingHelper {
       inspect(message);
 
       if (message.notification != null) {
-        showNotification(message.notification);
+        showNotification(message.notification, message.data['isExpert']);
         print('Message also contained a notification: ${message.notification}');
       }
     });
   }
 
-  static Future<void> showNotification(RemoteNotification? notification) async {
+  static Future<void> showNotification(
+      RemoteNotification? notification, bool? isExpert) async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
 
@@ -41,10 +42,9 @@ class FirebaseMessagingHelper {
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await flutterLocalNotificationsPlugin.show(
-      0,
-      notification!.title,
-      notification.body,
-      platformChannelSpecifics,
-    );
+        0, notification!.title, notification.body, platformChannelSpecifics,
+        payload: isExpert.toString());
   }
+
+  
 }
