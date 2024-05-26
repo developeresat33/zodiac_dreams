@@ -19,6 +19,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
   FirebaseAuthService authService = FirebaseAuthService();
+
   var userprop = Provider.of<UserProvider>(Get.context!, listen: false);
   @override
   void initState() {

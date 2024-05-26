@@ -10,6 +10,7 @@ import 'package:zodiac_star/dbHelper/firebase.dart';
 import 'package:zodiac_star/main.dart';
 import 'package:zodiac_star/screens/expert_home.dart';
 import 'package:zodiac_star/screens/home_page.dart';
+import 'package:zodiac_star/services/firebase_message.dart';
 import 'package:zodiac_star/services/storage_manager.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
@@ -89,12 +90,11 @@ class UserProvider extends ChangeNotifier {
         return;
       }
 
-      String? fcmToken = await messaging!.getToken();
+      String? fcmToken = await FirebaseMessagingHelper.messaging!.getToken();
       registerModel!.fcmToken = fcmToken;
 
-      DocumentReference docRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(firebaseUser.uid); 
+      DocumentReference docRef =
+          FirebaseFirestore.instance.collection('users').doc(firebaseUser.uid);
       registerModel!.uid = firebaseUser.uid;
       await docRef.set(registerModel!.toJson());
 
@@ -113,8 +113,6 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-
-
   Future<void> loginUser() async {
     onLoading(false);
     userModel = UserModel();
@@ -131,7 +129,8 @@ class UserProvider extends ChangeNotifier {
         userModel = UserModel.parseRegisterModelFromDocument(
             userDoc.data() as Map<String, dynamic>);
         if (userDoc.exists) {
-          String? getToken = await messaging!.getToken();
+          String? getToken =
+              await FirebaseMessagingHelper.messaging!.getToken();
 
           await _firestore
               .collection(FirebaseConstant.userCollection)
@@ -173,8 +172,6 @@ class UserProvider extends ChangeNotifier {
       );
     }
   }
-
-
 
   Future<void> addFavoriteDream(String dreamTitle) async {
     onLoading(false);

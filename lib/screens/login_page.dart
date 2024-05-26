@@ -1,16 +1,11 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/common_widgets/zodiac_textfield.dart';
 import 'package:zodiac_star/dbHelper/auth.dart';
-import 'package:zodiac_star/main.dart';
 import 'package:zodiac_star/screens/register_page.dart';
-import 'package:zodiac_star/services/firebase_message.dart';
 import 'package:zodiac_star/services/storage_manager.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
@@ -26,9 +21,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   FirebaseAuthService authService = FirebaseAuthService();
   var userprop = Provider.of<UserProvider>(Get.context!, listen: false);
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  bool notificationsEnabled = false;
 
   FirebaseAuth auth = FirebaseAuth.instance;
   @override
@@ -38,9 +30,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _init() async {
-    messaging = FirebaseMessaging.instance;
-    _requestPermissions();
-    await FirebaseMessagingHelper.initFirebaseMessaging();
     userprop.rememberMe = StorageManager.getBool("remind");
     if (userprop.rememberMe == true) {
       userprop.rememberMe = true;
@@ -51,37 +40,6 @@ class _LoginPageState extends State<LoginPage> {
       }
     } else {
       userprop.rememberMe = false;
-    }
-  }
-
-  Future<void> _requestPermissions() async {
-    if (Platform.isIOS || Platform.isMacOS) {
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              MacOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-    } else if (Platform.isAndroid) {
-      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
-
-      final bool? grantedNotificationPermission =
-          await androidImplementation?.requestNotificationsPermission();
-      setState(() {
-        notificationsEnabled = grantedNotificationPermission ?? false;
-      });
     }
   }
 

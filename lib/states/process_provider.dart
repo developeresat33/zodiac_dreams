@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:zodiac_star/data/request_model.dart';
 import 'package:zodiac_star/dbHelper/firebase.dart';
-import 'package:zodiac_star/services/notification_service.dart';
+import 'package:zodiac_star/services/firebase_message.dart';
+import 'package:zodiac_star/utils/functions.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
@@ -18,11 +19,9 @@ class ProcessProvider extends ChangeNotifier {
   ) async {
     onLoading(false);
     try {
-      inspect(requestModel);
-
       requestModel!.comment = comment;
       requestModel!.reply = "";
-      requestModel!.created_at = DateTime.now();
+      requestModel!.created_at = Functions.getPSTTime();
 
       DocumentReference senderDocRef = await _firestore
           .collection(FirebaseConstant.userCollection)
@@ -49,18 +48,22 @@ class ProcessProvider extends ChangeNotifier {
   }
 
   Future<void> alertMaster() async {
+    inspect(requestModel);
     try {
       DocumentSnapshot expertSnapshot = await _firestore
-          .collection('expert_account')
+          .collection(FirebaseConstant.userCollection)
           .where('uid', isEqualTo: requestModel!.receive_uid)
           .limit(1)
           .get()
           .then((snapshot) => snapshot.docs.first);
 
       var fcmToken = expertSnapshot.get('fcmToken');
-
-      CloudNotificationService.sendNotification(
-          "Uyarı", "Talep var.", fcmToken, true);
+      print(fcmToken);
+      FirebaseMessagingHelper.sendNotification(
+        "Uyarı",
+        "Talep var.",
+        fcmToken,
+      );
     } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
       onLoading(true);
@@ -71,7 +74,7 @@ class ProcessProvider extends ChangeNotifier {
   Future<void> alertUser() async {
     try {
       DocumentSnapshot userSnapshot = await _firestore
-          .collection('users')
+          .collection(FirebaseConstant.userCollection)
           .where('uid', isEqualTo: requestModel!.sender_uid)
           .limit(1)
           .get()
@@ -79,8 +82,11 @@ class ProcessProvider extends ChangeNotifier {
 
       var fcmToken = userSnapshot.get('fcmToken');
 
-      CloudNotificationService.sendNotification(
-          "Uyarı", "Talebiniz yorumlandı.", fcmToken, false);
+      FirebaseMessagingHelper.sendNotification(
+        "Uyarı",
+        "Talebiniz yorumlandı.",
+        fcmToken,
+      );
     } catch (e) {
       GetMsg.showMsg(e.toString(), option: 0);
       onLoading(true);
@@ -92,8 +98,6 @@ class ProcessProvider extends ChangeNotifier {
     String? comment,
   ) async {
     onLoading(false);
-    print("reply json");
-    inspect(requestModel);
 
     try {
       QuerySnapshot querySnapshotUser = await FirebaseFirestore.instance

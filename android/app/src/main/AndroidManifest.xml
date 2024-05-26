@@ -13,7 +13,9 @@
     <application
         android:label="Zodyak Yıldızı"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true"
+        >
 
         <!-- Ana Aktivite -->
         <activity

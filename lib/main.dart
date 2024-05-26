@@ -1,25 +1,26 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/screens/splash_screen.dart';
+import 'package:zodiac_star/services/firebase_message.dart';
 import 'package:zodiac_star/states/expression_provider.dart';
 import 'package:zodiac_star/states/home_page_provider.dart';
 import 'package:zodiac_star/states/process_provider.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'services/storage_manager.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
-FirebaseMessaging? messaging;
 bool? isRemind;
-bool? isExpert;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await StorageManager.initPrefs();
+  FirebaseMessagingHelper.initFirebaseMessaging();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => ProcessProvider()),
     ChangeNotifierProvider(create: (_) => ExpressionProvider()),
@@ -44,6 +45,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   _init() async {
+    initializeTimeZones();
     try {
       if (StorageManager.getBool("isRemind") != null) {
         isRemind = StorageManager.getBool("isRemind");
@@ -54,6 +56,12 @@ class _MyAppState extends State<MyApp> {
       print(e);
       isRemind = false;
     }
+  }
+
+  void initializeTimeZones() {
+    tz.initializeTimeZones();
+    final istanbul = tz.getLocation('Europe/Istanbul');
+    tz.setLocalLocation(istanbul);
   }
 
   @override
