@@ -18,6 +18,8 @@ class ProcessProvider extends ChangeNotifier {
   ) async {
     onLoading(false);
     try {
+      inspect(requestModel);
+
       requestModel!.comment = comment;
       requestModel!.reply = "";
       requestModel!.created_at = DateTime.now();
@@ -29,7 +31,7 @@ class ProcessProvider extends ChangeNotifier {
           .add(requestModel!.toJson());
 
       DocumentReference expertDocRef = await _firestore
-          .collection(FirebaseConstant.expertAccountCollection)
+          .collection(FirebaseConstant.userCollection)
           .doc(requestModel!.receive_uid!)
           .collection(FirebaseConstant.dreamRequestCollection)
           .add(requestModel!.toJson());
@@ -90,7 +92,7 @@ class ProcessProvider extends ChangeNotifier {
     String? comment,
   ) async {
     onLoading(false);
-
+    print("reply json");
     inspect(requestModel);
 
     try {
@@ -102,7 +104,7 @@ class ProcessProvider extends ChangeNotifier {
           .get();
 
       QuerySnapshot querySnapshotExpert = await FirebaseFirestore.instance
-          .collection(FirebaseConstant.expertAccountCollection)
+          .collection(FirebaseConstant.userCollection)
           .doc(requestModel!.receive_uid)
           .collection(FirebaseConstant.dreamRequestCollection)
           .where('request_uid', isEqualTo: requestModel!.request_uid)

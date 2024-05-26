@@ -14,14 +14,12 @@ import 'package:zodiac_star/widgets/ui/show_msg.dart';
 class ExpertSend extends StatefulWidget {
   final String? request_uid;
   final String? user_uid;
-  final String? user_nick;
   final String? user_name;
   final String? dreamComment;
 
   const ExpertSend({
     super.key,
     required this.user_uid,
-    required this.user_nick,
     required this.user_name,
     required this.dreamComment,
     required this.request_uid,
@@ -43,10 +41,7 @@ class _ExpertSendState extends State<ExpertSend> {
     print("REQUEST ID" + widget.request_uid.toString());
     proprop.requestModel = RequestModel(
       sender_uid: widget.user_uid,
-/*       receive_uid: userprop.expertModel!.uid,
-      receive: userprop.expertModel!.expertUsername,
-      receiveName: userprop.expertModel!.expertUsername, */
-      sender: widget.user_nick,
+      receive_uid: userprop.userModel!.uid,
       senderName: widget.user_name,
       request_uid: widget.request_uid,
     );

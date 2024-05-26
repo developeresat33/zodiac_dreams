@@ -79,7 +79,7 @@ class _ExpertHomeState extends State<ExpertHome> {
                                   margin: EdgeInsets.only(bottom: 10),
                                   child: ListTile(
                                     title: Text(
-                                        "Gönderen Kişi ${request['sender']}"),
+                                        "Gönderen Kişi ${request['senderName']}"),
                                     subtitle: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -115,8 +115,6 @@ class _ExpertHomeState extends State<ExpertHome> {
                                                         request['sender_uid'],
                                                     user_name:
                                                         request['senderName'],
-                                                    user_nick:
-                                                        request['sender'],
                                                     dreamComment:
                                                         request['comment'],
                                                   )),

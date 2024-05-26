@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen>
       userprop.userModel = UserModel.parseRegisterModelFromDocument(
           userDoc.data() as Map<String, dynamic>);
 
-      if (userprop.userModel!.isExpert!) {
+      if (userprop.userModel!.isExpert) {
         _controller!.forward().whenComplete(() {
           Get.to(() => ExpertHome());
         });

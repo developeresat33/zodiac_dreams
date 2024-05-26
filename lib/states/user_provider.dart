@@ -63,12 +63,10 @@ class UserProvider extends ChangeNotifier {
     onLoading(false);
 
     try {
-      // Kullanıcıyı Firebase Authentication üzerinde kontrol et
       User? firebaseUser = await authService.registerWithEmailAndPassword(
           registerModel!.email!, registerModel!.password!);
 
       if (firebaseUser == null) {
-        // Firebase Authentication ile kullanıcı oluşturulamadı
         onLoading(true);
         GetMsg.showMsg(
           "Kayıt işlemi başarısız. Lütfen daha sonra tekrar deneyiniz.",
@@ -77,14 +75,12 @@ class UserProvider extends ChangeNotifier {
         return;
       }
 
-      // Kullanıcı Firebase Firestore'a kaydedilmeden önce var olup olmadığını kontrol et
       QuerySnapshot querySnapshot = await _firestore
           .collection(FirebaseConstant.userCollection)
           .where('email', isEqualTo: registerModel!.email)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Kullanıcı zaten varsa kaydetmeyi durdur
         onLoading(true);
         GetMsg.showMsg(
           "Bu kullanıcı adı zaten kayıtlı. Lütfen başka bir kullanıcı adı giriniz.",
@@ -93,28 +89,22 @@ class UserProvider extends ChangeNotifier {
         return;
       }
 
-      // Firebase Cloud Messaging'den fcmToken al
       String? fcmToken = await messaging!.getToken();
       registerModel!.fcmToken = fcmToken;
 
-      // Kullanıcı bilgilerini Firestore'a kaydet
       DocumentReference docRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(firebaseUser.uid); // FirebaseAuth tarafından oluşturulan UID
+          .doc(firebaseUser.uid); 
       registerModel!.uid = firebaseUser.uid;
       await docRef.set(registerModel!.toJson());
 
-      // Kayıt başarılı mesajını göster
       GetMsg.showMsg("Kayıt başarıyla tamamlandı.", option: 1);
 
-      // Kaydedilen kullanıcı modelini güncelle
       userModel = registerModel;
 
-      // Yükleme ekranını kapat ve ana sayfaya yönlendir
       onLoading(true);
       Get.offAll(() => HomePage());
     } catch (e) {
-      // Hata durumunda yükleme ekranını kapat ve hata mesajını göster
       onLoading(true);
       GetMsg.showMsg(
         "Kayıt işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
@@ -123,29 +113,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> saveExpert() async {
-    try {
-      final data = {
-        "expert_username": "asya33",
-        "expert_name": "Asya",
-        "expert_pw": "asya3.3",
-        "fcmToken": "",
-        "uid": ""
-      };
 
-      DocumentReference docRef = await _firestore
-          .collection(FirebaseConstant.expertAccountCollection)
-          .add(data);
-
-      data['uid'] = docRef.id;
-
-      await docRef.update({'uid': docRef.id});
-
-      print('Belge başarıyla eklendi. Document ID: ${docRef.id}');
-    } catch (e) {
-      print('Belge eklenirken bir hata oluştu: $e');
-    }
-  }
 
   Future<void> loginUser() async {
     onLoading(false);
@@ -206,51 +174,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-/*   Future<void> loginExpert() async {
-    expertModel = ExpertModel();
-    onLoading(false);
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection(FirebaseConstant.expertAccountCollection)
-          .where('expert_username', isEqualTo: expertEmailCt!.text)
-          .where('expert_pw', isEqualTo: expertPasswordCt!.text)
-          .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot expertDoc = querySnapshot.docs.first;
-
-        if (expertDoc['expert_pw'] == expertPasswordCt!.text) {
-          String? fcmToken = await messaging!.getToken();
-
-          await _firestore
-              .collection(FirebaseConstant.expertAccountCollection)
-              .doc(expertDoc.id)
-              .update({
-            'fcmToken': fcmToken,
-          });
-
-          expertModel = ExpertModel.parseRegisterModelFromDocument(
-              expertDoc.data() as Map<String, dynamic>);
-          expertModel!.fcmToken = fcmToken;
-
-          onLoading(true);
-          Get.offAll(() => ExpertHome());
-        } else {
-          onLoading(true);
-          GetMsg.showMsg("Hatalı şifre.", option: 0);
-        }
-      } else {
-        onLoading(true);
-        GetMsg.showMsg("Kullanıcı bulunamadı.", option: 0);
-      }
-    } catch (e) {
-      onLoading(true);
-      GetMsg.showMsg(
-        "Giriş işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
-        option: 0,
-      );
-    }
-  } */
 
   Future<void> addFavoriteDream(String dreamTitle) async {
     onLoading(false);
