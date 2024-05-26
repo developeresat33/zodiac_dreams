@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,8 +7,8 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/common_widgets/zodiac_textfield.dart';
+import 'package:zodiac_star/dbHelper/auth.dart';
 import 'package:zodiac_star/main.dart';
-import 'package:zodiac_star/screens/expert_login.dart';
 import 'package:zodiac_star/screens/register_page.dart';
 import 'package:zodiac_star/services/firebase_message.dart';
 import 'package:zodiac_star/services/storage_manager.dart';
@@ -24,10 +24,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  FirebaseAuthService authService = FirebaseAuthService();
   var userprop = Provider.of<UserProvider>(Get.context!, listen: false);
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   bool notificationsEnabled = false;
+
+  FirebaseAuth auth = FirebaseAuth.instance;
   @override
   void initState() {
     _init();
@@ -83,12 +86,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   initLogin() async {
-    userprop.nickCt?.text = StorageManager.getString("id");
+    userprop.emailCt?.text = StorageManager.getString("id");
     userprop.passwordCt?.text = StorageManager.getString("pw");
-    if (autoLogin == 0) {
-      doLogin(userprop);
-    }
-    autoLogin++;
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -107,23 +106,20 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            GestureDetector(
-                              onLongPress: () => Get.to(() => LoginExpert()),
+                            Container(
+                              height: 190,
+                              width: 190,
+                              decoration: BoxDecoration(
+                                  color: Color.fromRGBO(42, 48, 70, 1),
+                                  borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(100))),
                               child: Container(
-                                height: 190,
-                                width: 190,
-                                decoration: BoxDecoration(
-                                    color: Color.fromRGBO(42, 48, 70, 1),
-                                    borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(100))),
-                                child: Container(
-                                  margin: EdgeInsets.only(left: 20),
-                                  height: 130,
-                                  width: 130,
-                                  child: Image.asset(
-                                    "assets/splash.png",
-                                    fit: BoxFit.scaleDown,
-                                  ),
+                                margin: EdgeInsets.only(left: 20),
+                                height: 130,
+                                width: 130,
+                                child: Image.asset(
+                                  "assets/splash.png",
+                                  fit: BoxFit.scaleDown,
                                 ),
                               ),
                             )
@@ -163,8 +159,8 @@ class _LoginPageState extends State<LoginPage> {
                                     children: [
                                       Expanded(
                                           child: ZodiacTextField(
-                                        controller: _.nickCt,
-                                        hintText: "Kullanıcı Adı",
+                                        controller: _.emailCt,
+                                        hintText: "Kullanıcı E-Posta",
                                         validator: (p0) {
                                           if (p0!.isEmpty) {
                                             return "*Zorunlu Alan";
@@ -276,7 +272,6 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       StorageManager.setBool("isRemind", _.rememberMe!);
       _.loginUser();
-      /*   _.saveExpert(); */
     } else {
       GetMsg.showMsg("Zorunlu alanları doldurunuz.", option: 0);
     }

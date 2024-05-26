@@ -42,7 +42,7 @@ class _SendRequestState extends State<SendRequest> {
       receive_uid: widget.master_uid,
       receive: widget.master_nick,
       receiveName: widget.master_name,
-      sender: userprop.userModel!.nick,
+      sender: userprop.userModel!.email,
       senderName: userprop.userModel!.nameSurname,
     );
   }

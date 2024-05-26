@@ -43,9 +43,9 @@ class _ExpertSendState extends State<ExpertSend> {
     print("REQUEST ID" + widget.request_uid.toString());
     proprop.requestModel = RequestModel(
       sender_uid: widget.user_uid,
-      receive_uid: userprop.expertModel!.uid,
+/*       receive_uid: userprop.expertModel!.uid,
       receive: userprop.expertModel!.expertUsername,
-      receiveName: userprop.expertModel!.expertUsername,
+      receiveName: userprop.expertModel!.expertUsername, */
       sender: widget.user_nick,
       senderName: widget.user_name,
       request_uid: widget.request_uid,

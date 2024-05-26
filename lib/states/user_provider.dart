@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:zodiac_star/controller/register_controller.dart';
-import 'package:zodiac_star/data/expert_model.dart';
 import 'package:zodiac_star/data/user_model.dart';
+import 'package:zodiac_star/dbHelper/auth.dart';
 import 'package:zodiac_star/dbHelper/firebase.dart';
 import 'package:zodiac_star/main.dart';
 import 'package:zodiac_star/screens/expert_home.dart';
@@ -14,14 +15,15 @@ import 'package:zodiac_star/widgets/ui/loading.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class UserProvider extends ChangeNotifier {
+  FirebaseAuthService authService = FirebaseAuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool? rememberMe = false;
   RegisterController? registerController = RegisterController();
   UserModel? registerModel, userModel;
-  ExpertModel? expertModel;
-  TextEditingController? nickCt = TextEditingController();
+
+  TextEditingController? emailCt = TextEditingController();
   TextEditingController? passwordCt = TextEditingController();
-  TextEditingController? expertNickCt = TextEditingController();
+  TextEditingController? expertEmailCt = TextEditingController();
   TextEditingController? expertPasswordCt = TextEditingController();
   final webScraper = WebScraper('https://www.haberler.com');
 
@@ -61,12 +63,28 @@ class UserProvider extends ChangeNotifier {
     onLoading(false);
 
     try {
+      // Kullanıcıyı Firebase Authentication üzerinde kontrol et
+      User? firebaseUser = await authService.registerWithEmailAndPassword(
+          registerModel!.email!, registerModel!.password!);
+
+      if (firebaseUser == null) {
+        // Firebase Authentication ile kullanıcı oluşturulamadı
+        onLoading(true);
+        GetMsg.showMsg(
+          "Kayıt işlemi başarısız. Lütfen daha sonra tekrar deneyiniz.",
+          option: 0,
+        );
+        return;
+      }
+
+      // Kullanıcı Firebase Firestore'a kaydedilmeden önce var olup olmadığını kontrol et
       QuerySnapshot querySnapshot = await _firestore
           .collection(FirebaseConstant.userCollection)
-          .where('nick', isEqualTo: registerModel!.nick)
+          .where('email', isEqualTo: registerModel!.email)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
+        // Kullanıcı zaten varsa kaydetmeyi durdur
         onLoading(true);
         GetMsg.showMsg(
           "Bu kullanıcı adı zaten kayıtlı. Lütfen başka bir kullanıcı adı giriniz.",
@@ -75,27 +93,29 @@ class UserProvider extends ChangeNotifier {
         return;
       }
 
+      // Firebase Cloud Messaging'den fcmToken al
       String? fcmToken = await messaging!.getToken();
-      print(fcmToken);
       registerModel!.fcmToken = fcmToken;
 
-      DocumentReference docRef =
-          await _firestore.collection('users').add(registerModel!.toJson());
+      // Kullanıcı bilgilerini Firestore'a kaydet
+      DocumentReference docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(firebaseUser.uid); // FirebaseAuth tarafından oluşturulan UID
+      registerModel!.uid = firebaseUser.uid;
+      await docRef.set(registerModel!.toJson());
 
-      registerModel!.uid = docRef.id;
-      await docRef.update({'uid': docRef.id});
-
+      // Kayıt başarılı mesajını göster
       GetMsg.showMsg("Kayıt başarıyla tamamlandı.", option: 1);
 
+      // Kaydedilen kullanıcı modelini güncelle
       userModel = registerModel;
 
+      // Yükleme ekranını kapat ve ana sayfaya yönlendir
       onLoading(true);
-
       Get.offAll(() => HomePage());
     } catch (e) {
+      // Hata durumunda yükleme ekranını kapat ve hata mesajını göster
       onLoading(true);
-
-      // Hata mesajı göster
       GetMsg.showMsg(
         "Kayıt işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.toString()}",
         option: 0,
@@ -113,13 +133,12 @@ class UserProvider extends ChangeNotifier {
         "uid": ""
       };
 
-      DocumentReference docRef =
-          await _firestore.collection(FirebaseConstant.expertAccountCollection).add(data);
+      DocumentReference docRef = await _firestore
+          .collection(FirebaseConstant.expertAccountCollection)
+          .add(data);
 
-      // UID'yi belgeye ekleyin
       data['uid'] = docRef.id;
 
-      // UID'yi belgeye güncelleyin
       await docRef.update({'uid': docRef.id});
 
       print('Belge başarıyla eklendi. Document ID: ${docRef.id}');
@@ -129,45 +148,50 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> loginUser() async {
-    userModel = UserModel();
     onLoading(false);
+    userModel = UserModel();
 
     try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection(FirebaseConstant.userCollection)
-          .where('nick', isEqualTo: nickCt!.text)
-          .where('password', isEqualTo: passwordCt!.text)
-          .get();
+      User? firebaseUser = await authService.signInWithEmailAndPassword(
+        emailCt!.text,
+        passwordCt!.text,
+      );
 
-      if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
-
-        if (userDoc['password'] == passwordCt!.text) {
-          String? fcmToken = await messaging!.getToken();
+      if (firebaseUser != null) {
+        DocumentSnapshot? userDoc =
+            await _firestore.collection('users').doc(firebaseUser.uid).get();
+        userModel = UserModel.parseRegisterModelFromDocument(
+            userDoc.data() as Map<String, dynamic>);
+        if (userDoc.exists) {
+          String? getToken = await messaging!.getToken();
 
           await _firestore
               .collection(FirebaseConstant.userCollection)
               .doc(userDoc.id)
               .update({
-            'fcmToken': fcmToken,
+            'fcmToken': getToken,
           });
 
-          userModel = UserModel.parseRegisterModelFromDocument(
-              userDoc.data() as Map<String, dynamic>);
-          userModel!.fcmToken = fcmToken;
+          userModel!.fcmToken = getToken;
 
-          if (rememberMe!) {
-            StorageManager.setString("id", nickCt!.text);
+          if (isRemind == true) {
+            StorageManager.setString("id", emailCt!.text);
             StorageManager.setString("pw", passwordCt!.text);
             StorageManager.setBool("remind", true);
           }
 
-          isExpert = false;
           onLoading(true);
-          Get.offAll(() => HomePage());
+
+          if (userModel!.isExpert) {
+            Get.offAll(() => ExpertHome());
+          } else {
+            Get.offAll(() => HomePage());
+          }
         } else {
           onLoading(true);
-          GetMsg.showMsg("Hatalı şifre.", option: 0);
+          GetMsg.showMsg(
+              "Kullanıcı belgesi bulunamadı. Hatalı e-posta veya şifre",
+              option: 0);
         }
       } else {
         onLoading(true);
@@ -182,13 +206,13 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loginExpert() async {
+/*   Future<void> loginExpert() async {
     expertModel = ExpertModel();
     onLoading(false);
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection(FirebaseConstant.expertAccountCollection)
-          .where('expert_username', isEqualTo: expertNickCt!.text)
+          .where('expert_username', isEqualTo: expertEmailCt!.text)
           .where('expert_pw', isEqualTo: expertPasswordCt!.text)
           .get();
 
@@ -226,7 +250,7 @@ class UserProvider extends ChangeNotifier {
         option: 0,
       );
     }
-  }
+  } */
 
   Future<void> addFavoriteDream(String dreamTitle) async {
     onLoading(false);

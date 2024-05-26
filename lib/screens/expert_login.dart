@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
@@ -26,7 +26,7 @@ class _LoginExpertState extends State<LoginExpert> {
   }
 
   _init() {
-    userprop.expertNickCt = TextEditingController();
+    userprop.expertEmailCt = TextEditingController();
     userprop.expertPasswordCt = TextEditingController();
   }
 
@@ -49,7 +49,7 @@ class _LoginExpertState extends State<LoginExpert> {
                         children: [
                           Expanded(
                               child: ZodiacTextField(
-                            controller: _.expertNickCt,
+                            controller: _.expertEmailCt,
                             hintText: "Yorumcu Kullanıcı Adı",
                             validator: (p0) {
                               if (p0!.isEmpty) {
@@ -102,3 +102,4 @@ class _LoginExpertState extends State<LoginExpert> {
     }
   }
 }
+ */

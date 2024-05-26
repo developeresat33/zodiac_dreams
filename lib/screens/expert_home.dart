@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/dbHelper/firebase.dart';
-import 'package:zodiac_star/screens/expert_login.dart';
 import 'package:zodiac_star/screens/expert_send.dart';
+import 'package:zodiac_star/screens/login_page.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/functions.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
@@ -34,7 +34,7 @@ class _ExpertHomeState extends State<ExpertHome> {
                   "Yorumcu Anasayfa",
                   leading: IconButton(
                     onPressed: () {
-                      Get.offAll(() => LoginExpert());
+                      Get.offAll(() => LoginPage());
                     },
                     icon: Icon(Icons.menu_open_rounded),
                   ),
@@ -49,8 +49,8 @@ class _ExpertHomeState extends State<ExpertHome> {
                     Expanded(
                       child: StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
-                            .collection('expert_account')
-                            .doc(_.expertModel!.uid)
+                            .collection('users')
+                            .doc(_.userModel!.uid)
                             .collection(FirebaseConstant.dreamRequestCollection)
                             .where('isFinish', isEqualTo: false)
                             .snapshots(),

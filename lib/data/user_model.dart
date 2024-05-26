@@ -1,8 +1,6 @@
-/* import 'package:mongo_dart/mongo_dart.dart'; */
-
 class UserModel {
-  dynamic uid;
-  String? nick;
+  String? uid;
+  String? email;
   String? nameSurname;
   String? age;
   String? birthDate;
@@ -10,38 +8,41 @@ class UserModel {
   String? password;
   int? gem;
   String? fcmToken;
+  bool isExpert;
 
-  UserModel(
-      {this.nick,
-      this.uid,
-      this.nameSurname,
-      this.age,
-      this.birthDate,
-      this.horoscope,
-      this.password,
-      this.gem = 0,
-      this.fcmToken});
+  UserModel({
+    this.email,
+    this.isExpert = false, // default olarak false olarak ayarlandı
+    this.uid,
+    this.nameSurname,
+    this.age,
+    this.birthDate,
+    this.horoscope,
+    this.password,
+    this.gem = 0,
+    this.fcmToken,
+  });
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nick'] = this.nick;
-    data['nameSurname'] = this.nameSurname;
-    data['age'] = this.age;
-    data['birthDate'] = this.birthDate;
-    data['horoscope'] = this.horoscope;
-    data['password'] = this.password;
-    data['gem'] = this.gem;
-    data['fcmToken'] = this.fcmToken;
-    data['uid'] = this.uid;
-
-    return data;
+    return {
+      'email': email,
+      'isExpert': isExpert,
+      'nameSurname': nameSurname,
+      'age': age,
+      'birthDate': birthDate,
+      'horoscope': horoscope,
+      'password': password,
+      'gem': gem,
+      'fcmToken': fcmToken,
+      'uid': uid,
+    };
   }
 
-  static UserModel parseRegisterModelFromDocument(
-      Map<String, dynamic> document) {
+  static UserModel parseRegisterModelFromDocument(Map<String, dynamic> document) {
     return UserModel(
       uid: document['uid'],
-      nick: document['nick'],
+      isExpert: document['isExpert'] ?? false, // varsayılan değer eklendi
+      email: document['email'],
       nameSurname: document['nameSurname'],
       age: document['age'],
       birthDate: document['birthDate'],

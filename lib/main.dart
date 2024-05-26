@@ -10,13 +10,12 @@ import 'package:zodiac_star/states/home_page_provider.dart';
 import 'package:zodiac_star/states/process_provider.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'services/storage_manager.dart';
 
 FirebaseMessaging? messaging;
 bool? isRemind;
 bool? isExpert;
-int autoLogin = 0;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

@@ -34,7 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return SafeArea(
       child: Consumer(
           builder: (context, UserProvider _, child) => Scaffold(
-            appBar: AppBarWidget.getAppBar("Kayıt Ol"),
+                appBar: AppBarWidget.getAppBar("Kayıt Ol"),
                 resizeToAvoidBottomInset: true,
                 body: Column(
                   children: [
@@ -51,9 +51,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                 Expanded(
                                     child: ZodiacTextField(
                                   controller: _.registerController!.nickCt,
-                                  hintText: "Kullanıcı Adı",
+                                  hintText: "Kullanıcı E-Posta",
                                   onChanged: (value) =>
-                                      _.registerModel!.nick = value,
+                                      _.registerModel!.email = value,
                                   validator: (p0) {
                                     if (p0!.isEmpty) {
                                       return "*Zorunlu Alan";
