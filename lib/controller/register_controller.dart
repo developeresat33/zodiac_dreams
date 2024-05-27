@@ -4,7 +4,6 @@ class RegisterController {
   TextEditingController? nickCt;
   TextEditingController? nameSurnameCt;
   TextEditingController? ageCt;
-  TextEditingController? birthDateCt;
   TextEditingController? horoscopeCt;
   TextEditingController? passwordCt;
   TextEditingController? confirmPasswordCt;
@@ -13,7 +12,6 @@ class RegisterController {
     nickCt = TextEditingController();
     nameSurnameCt = TextEditingController();
     ageCt = TextEditingController();
-    birthDateCt = TextEditingController();
     horoscopeCt = TextEditingController();
     passwordCt = TextEditingController();
     confirmPasswordCt = TextEditingController();

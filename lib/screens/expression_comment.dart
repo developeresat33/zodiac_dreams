@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:zodiac_star/common_widgets/zodiac_button.dart';
 import 'package:zodiac_star/screens/send_request.dart';
+import 'package:zodiac_star/utils/functions.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/loading.dart';
 
@@ -14,20 +16,9 @@ class ExpressionComment extends StatefulWidget {
 }
 
 class _ExpressionCommentState extends State<ExpressionComment> {
-  late Future<List<Map<String, dynamic>>> _expertsFuture;
-
   @override
   void initState() {
-    _expertsFuture = getExpertsFromFirestore();
     super.initState();
-  }
-
-  Future<List<Map<String, dynamic>>> getExpertsFromFirestore() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('expert_user').get();
-    return querySnapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
   }
 
   @override
@@ -37,17 +28,19 @@ class _ExpressionCommentState extends State<ExpressionComment> {
         children: [
           10.h,
           Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: _expertsFuture,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('expert_user')
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: getLoading());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Hata: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(child: Text('Yorumcu bulunamadı.'));
                 } else {
-                  var experts = snapshot.data!;
+                  var experts = snapshot.data!.docs;
                   return ListView.builder(
                     itemCount: experts.length,
                     itemBuilder: (context, index) {
@@ -96,7 +89,7 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  8.h,
+                                  SizedBox(height: 8),
                                   Text(
                                     expert['expert_name'] ?? '',
                                     style: TextStyle(
@@ -108,7 +101,7 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                                   SizedBox(height: 5),
                                   Text(
                                     expert['expert_desp'] ?? '',
-                                    maxLines: 3,
+                                    maxLines: 8,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.white70,
@@ -123,11 +116,11 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                                             ? Colors.green
                                             : Colors.redAccent,
                                       ),
-                                      15.w,
+                                      SizedBox(width: 15),
                                       Text(
                                         expert['avaible']
                                             ? "Yorumlamaya hazır"
-                                            : "Yorumlamaya hazır değil",
+                                            : "Meşgul",
                                         style: TextStyle(
                                           color: expert['avaible']
                                               ? Colors.green
@@ -138,21 +131,48 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                                   ),
                                   SizedBox(height: 15),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      ZodiacButton(
-                                        size: Size(100, 40),
-                                        onPressed: () {
-                                          Get.to(() => SendRequest(
-                                                master_uid: expert['uid'],
-                                                master_name:
-                                                    expert['expert_name'],
-                                                master_nick:
-                                                    expert['expert_username'],
-                                              ));
-                                        },
-                                        child: Text("Başlat"),
-                                      )
+                                      SizedBox(
+                                        height:
+                                            Functions.screenSize.height * 0.030,
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: RatingBar.builder(
+                                            initialRating:
+                                                expert['rate']?.toDouble() ??
+                                                    0.0,
+                                            minRating: 1,
+                                            ignoreGestures: true,
+                                            allowHalfRating: true,
+                                            direction: Axis.horizontal,
+                                            itemCount: 5,
+                                            itemBuilder: (context, _) => Icon(
+                                              Icons.star,
+                                              color: Colors.orangeAccent,
+                                            ),
+                                            onRatingUpdate: (rating) {
+                                              print(rating);
+                                            },
+                                            tapOnlyMode: true,
+                                          ),
+                                        ),
+                                      ),
+                                      if (expert['avaible'])
+                                        ZodiacButton(
+                                          size: Size(100, 40),
+                                          onPressed: () {
+                                            Get.to(() => SendRequest(
+                                                  master_uid: expert['uid'],
+                                                  master_name:
+                                                      expert['expert_name'],
+                                                  master_nick:
+                                                      expert['expert_username'],
+                                                ));
+                                          },
+                                          child: Text("Başlat"),
+                                        )
                                     ],
                                   )
                                 ],
@@ -160,13 +180,13 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                             ),
                           ],
                         ),
-                      );
+                      ).paddingOnly(bottom: 10);
                     },
                   );
                 }
               },
             ),
-          ),
+          )
         ],
       ).paddingSymmetric(horizontal: 10),
     );

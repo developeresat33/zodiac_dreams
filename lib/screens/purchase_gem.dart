@@ -65,7 +65,7 @@ class _PurchaseGemState extends State<PurchaseGem> {
                                           .format(double.parse(MiniItems
                                                   .packageItems[index]
                                                   .packagePrice ??
-                                              "0")).replaceAll("TRY", "")),
+                                              "0"))),
                                     ))
                                   ],
                                 ),

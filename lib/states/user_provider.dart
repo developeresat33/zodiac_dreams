@@ -67,15 +67,7 @@ class UserProvider extends ChangeNotifier {
       User? firebaseUser = await authService.registerWithEmailAndPassword(
           registerModel!.email!, registerModel!.password!);
 
-      if (firebaseUser == null) {
-        onLoading(true);
-        GetMsg.showMsg(
-          "Kayıt işlemi başarısız. Lütfen daha sonra tekrar deneyiniz.",
-          option: 0,
-        );
-        return;
-      }
-
+      // Kullanıcı kaydını kontrol et
       QuerySnapshot querySnapshot = await _firestore
           .collection(FirebaseConstant.userCollection)
           .where('email', isEqualTo: registerModel!.email)
@@ -84,17 +76,19 @@ class UserProvider extends ChangeNotifier {
       if (querySnapshot.docs.isNotEmpty) {
         onLoading(true);
         GetMsg.showMsg(
-          "Bu kullanıcı adı zaten kayıtlı. Lütfen başka bir kullanıcı adı giriniz.",
+          "Bu kullanıcı e-posta zaten kayıtlı. Lütfen başka bir email giriniz.",
           option: 0,
         );
         return;
       }
 
+      // FCM tokeni al
       String? fcmToken = await FirebaseMessagingHelper.messaging!.getToken();
       registerModel!.fcmToken = fcmToken;
 
+      // Kullanıcı verisini Firestore'a kaydet
       DocumentReference docRef =
-          FirebaseFirestore.instance.collection('users').doc(firebaseUser.uid);
+          _firestore.collection('users').doc(firebaseUser!.uid);
       registerModel!.uid = firebaseUser.uid;
       await docRef.set(registerModel!.toJson());
 
@@ -104,6 +98,19 @@ class UserProvider extends ChangeNotifier {
 
       onLoading(true);
       Get.offAll(() => HomePage());
+    } on FirebaseAuthException catch (e) {
+      onLoading(true);
+      if (e.code == 'email-already-in-use') {
+        GetMsg.showMsg(
+          "Bu e-posta adresi zaten kayıtlı. Lütfen başka bir e-posta adresi deneyiniz.",
+          option: 0,
+        );
+      } else {
+        GetMsg.showMsg(
+          "Kayıt işlemi başarısız, lütfen daha sonra tekrar deneyiniz. ${e.message}",
+          option: 0,
+        );
+      }
     } catch (e) {
       onLoading(true);
       GetMsg.showMsg(

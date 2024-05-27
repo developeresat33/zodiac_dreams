@@ -42,7 +42,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 15.h,
                 CardTile(
-                  onTap: () => _.addFavoriteDream("Rüyata At Görmek"),
+                /*   onTap: () => _.addFavoriteDream("Rüyata At Görmek"), */
                   leading: FontAwesomeIcons.wandMagicSparkles,
                   title: "Bir uzman'dan tabir yorumu al",
                   desp:

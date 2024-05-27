@@ -3,7 +3,6 @@ class UserModel {
   String? email;
   String? nameSurname;
   String? age;
-  String? birthDate;
   String? horoscope;
   String? password;
   int? gem;
@@ -16,7 +15,6 @@ class UserModel {
     this.uid,
     this.nameSurname,
     this.age,
-    this.birthDate,
     this.horoscope,
     this.password,
     this.gem = 0,
@@ -29,7 +27,6 @@ class UserModel {
       'isExpert': isExpert,
       'nameSurname': nameSurname,
       'age': age,
-      'birthDate': birthDate,
       'horoscope': horoscope,
       'password': password,
       'gem': gem,
@@ -38,14 +35,14 @@ class UserModel {
     };
   }
 
-  static UserModel parseRegisterModelFromDocument(Map<String, dynamic> document) {
+  static UserModel parseRegisterModelFromDocument(
+      Map<String, dynamic> document) {
     return UserModel(
       uid: document['uid'],
-      isExpert: document['isExpert'] ?? false, // varsayılan değer eklendi
+      isExpert: document['isExpert'] ?? false,
       email: document['email'],
       nameSurname: document['nameSurname'],
       age: document['age'],
-      birthDate: document['birthDate'],
       horoscope: document['horoscope'],
       password: document['password'],
       gem: document['gem'],

@@ -37,7 +37,7 @@ class MiniItems {
       icon: Icons.drive_file_rename_outline_rounded,
       packageName: "Standart Paket",
       packageDescription:
-          "1 Elmas karşılığında uzmanımızdan rüya tabir yorumu alabilirsiniz.",
+          "1 Elmas karşılığında uzmanlarımızdan rüya tabiri yorumu alabilirsiniz.",
       packagePrice: "180.00",
       packageId: 1,
     ),
@@ -45,7 +45,7 @@ class MiniItems {
       icon: Icons.star_border_purple500_rounded,
       packageName: "Kalp Gözü Paketi",
       packageDescription:
-          "2 Elmas karşılığında uzmanımızdan Kariyer , Aşk , Sağlık ile ilgili ya da  merak ettiğiniz herhangi bir konu ile ilgili sezgisel öngörü yorumu alabilirsiniz.",
+          "2 Elmas karşılığında uzmanlarımızdan Kariyer , Aşk , Sağlık ile ilgili ya da  merak ettiğiniz herhangi bir konu ile ilgili sezgisel öngörü yorumu alabilirsiniz.",
       packagePrice: "300.00",
       packageId: 2,
     )

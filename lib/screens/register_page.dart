@@ -8,7 +8,6 @@ import 'package:zodiac_star/data/user_model.dart';
 import 'package:zodiac_star/dialogs/user_dialog.dart';
 import 'package:zodiac_star/states/user_provider.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
-import 'package:zodiac_star/widgets/select_date.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
@@ -57,6 +56,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                   validator: (p0) {
                                     if (p0!.isEmpty) {
                                       return "*Zorunlu Alan";
+                                    }
+                                    // E-posta regex kontrolü
+                                    final emailRegex = RegExp(
+                                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                                    if (!emailRegex.hasMatch(p0)) {
+                                      return "Geçerli bir e-posta giriniz";
                                     }
                                     return null;
                                   },
@@ -108,28 +113,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                     FilteringTextInputFormatter.digitsOnly,
                                     LengthLimitingTextInputFormatter(2),
                                   ],
-                                ))
-                              ],
-                            ),
-                            10.h,
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: ZodiacTextField(
-                                  controller: _.registerController!.birthDateCt,
-                                  readOnly: true,
-                                  hintText: "Doğum Tarihiniz",
-                                  onTap: () {
-                                    selectDate(
-                                        _.registerController!.birthDateCt!,
-                                        option: 0);
-                                  },
-                                  validator: (p0) {
-                                    if (p0!.isEmpty) {
-                                      return "*Zorunlu Alan";
-                                    }
-                                    return null;
-                                  },
                                 ))
                               ],
                             ),

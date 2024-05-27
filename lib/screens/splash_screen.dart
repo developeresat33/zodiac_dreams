@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: 1000),
     );
     _autoLogin();
   }
@@ -47,16 +47,16 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (userprop.userModel!.isExpert) {
         _controller!.forward().whenComplete(() {
-          Get.to(() => ExpertHome());
+          Get.offAll(() => ExpertHome());
         });
       } else {
         _controller!.forward().whenComplete(() {
-          Get.to(() => HomePage());
+          Get.offAll(() => HomePage());
         });
       }
     } else {
       _controller!.forward().whenComplete(() {
-        Get.to(() => LoginPage());
+        Get.offAll(() => LoginPage());
       });
     }
   }
@@ -64,20 +64,22 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: AnimatedBuilder(
-          animation: _controller!,
-          builder: (context, child) {
-            return Opacity(
-              opacity: _controller!.value,
-              child: Container(
-                width: 200 * _controller!.value,
-                height: 200 * _controller!.value,
-                child: Image.asset('assets/splash.png'),
-              ),
-            );
-          },
-        ),
+      body: AnimatedBuilder(
+        animation: _controller!,
+        builder: (context, child) {
+          return Align(
+              alignment: Alignment(1 - (_controller!.value), 0),
+              child: Opacity(
+                  opacity: _controller!.value,
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    child: Image.asset(
+                      'assets/splash.png',
+                      fit: BoxFit.scaleDown,
+                    ),
+                  )));
+        },
       ),
     );
   }

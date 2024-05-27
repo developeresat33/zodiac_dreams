@@ -77,7 +77,7 @@ class _MyAppState extends State<MyApp> {
       locale: const Locale('tr', 'TR'),
       theme: ThemeData(
           useMaterial3: true,
-          fontFamily: GoogleFonts.openSans().fontFamily,
+          fontFamily: GoogleFonts.roboto().fontFamily,
           brightness: Brightness.dark,
           colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,

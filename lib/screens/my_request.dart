@@ -24,6 +24,22 @@ class _MyRequestState extends State<MyRequest> {
     super.initState();
   }
 
+  reverse(var myRequests) {
+    myRequests.sort((a, b) {
+      bool aIsFinish = a['isFinish'];
+      bool bIsFinish = b['isFinish'];
+      // Tamamlanmamış olanlar önce gelmeli
+      if (!aIsFinish && bIsFinish) {
+        return -1; // a önce gelmeli
+      } else if (aIsFinish && !bIsFinish) {
+        return 1; // b önce gelmeli
+      } else {
+        // İkisi de aynı durumda ise sıralamada bir değişiklik yapma
+        return 0;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -52,6 +68,7 @@ class _MyRequestState extends State<MyRequest> {
                             return Center(child: Text('Talep bulunamadı.'));
                           } else {
                             var myRequests = snapshot.data!.docs;
+                            reverse(myRequests);
                             return ListView.builder(
                               itemCount: myRequests.length,
                               itemBuilder: (context, index) {

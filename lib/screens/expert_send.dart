@@ -38,7 +38,6 @@ class _ExpertSendState extends State<ExpertSend> {
 
   @override
   void initState() {
-    print("REQUEST ID" + widget.request_uid.toString());
     proprop.requestModel = RequestModel(
       sender_uid: widget.user_uid,
       receive_uid: userprop.userModel!.uid,
@@ -57,18 +56,16 @@ class _ExpertSendState extends State<ExpertSend> {
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    Expanded(
-                        flex: 2,
-                        child: ListView(
-                          children: [
-                            10.h,
-                            Row(
-                              children: [
-                                Expanded(child: Text(widget.dreamComment!))
-                              ],
-                            ),
-                          ],
-                        )),
+                    20.h,
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          "Soru : " + widget.dreamComment!,
+                          style: TextStyle(fontSize: 16),
+                        ))
+                      ],
+                    ),
                     20.h,
                     if (!hasSentRequest) ...[
                       Spacer(),
@@ -77,10 +74,10 @@ class _ExpertSendState extends State<ExpertSend> {
                           Expanded(
                             child: ZodiacTextField(
                               controller: _requestController,
-                              hintText: "Rüyanızı yazınız",
+                              hintText: "Yorumu yazınız",
                             ),
                           ),
-                          SizedBox(width: 10),
+                          10.w,
                           IconButton(
                             icon: Icon(Icons.send, color: Colors.white),
                             onPressed: () async {
@@ -113,12 +110,23 @@ class _ExpertSendState extends State<ExpertSend> {
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              userRequest,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white70,
+                            10.h,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(30, 33, 37, 1),
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                ),
+                              ),
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                userRequest,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],

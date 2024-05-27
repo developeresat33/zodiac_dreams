@@ -55,11 +55,16 @@ class _SendRequestState extends State<SendRequest> {
                 child: Column(
                   children: [
                     10.h,
-                    Text(
-                      "Lütfen rüyanızı anlaşılabilir bir biçimde tek seferde yazınız. Talep tek seferde oluşturulup mevcut taleplerim sayfanıza düşecektir. Uzman yorumcu yorumladıktan hemen sonra taleplerim sayfanızda ilgili talebinizden yorumu görüntüleyebilirsiniz.",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    10.h,
+                    if (!hasSentRequest)
+                      Column(
+                        children: [
+                          Text(
+                            "Lütfen rüyanızı anlaşılabilir bir biçimde tek seferde yazınız. Talep tek seferde oluşturulup mevcut taleplerim sayfanıza düşecektir. Uzman yorumcu yorumladıktan hemen sonra taleplerim sayfanızda ilgili talebinizden yorumu görüntüleyebilirsiniz.",
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          10.h,
+                        ],
+                      ),
                     if (!hasSentRequest) ...[
                       Spacer(),
                       Row(
@@ -70,7 +75,7 @@ class _SendRequestState extends State<SendRequest> {
                               hintText: "Rüyanızı yazınız",
                             ),
                           ),
-                          SizedBox(width: 10),
+                          10.w,
                           IconButton(
                             icon: Icon(Icons.send, color: Colors.white),
                             onPressed: () async {
@@ -96,19 +101,30 @@ class _SendRequestState extends State<SendRequest> {
                         child: ListView(
                           children: [
                             Text(
-                              "Gönderdiğiniz Rüya Sorusu:",
+                              "Gönderdiğiniz Rüya Talebi",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              userRequest,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white70,
+                            10.h,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(30, 33, 37, 1),
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                ),
+                              ),
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                userRequest,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
