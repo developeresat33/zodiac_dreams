@@ -1,4 +1,4 @@
-/* import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac_star/common_widgets/card_tile.dart';
@@ -60,18 +60,23 @@ class _ExpressionsState extends State<Expressions> {
                       },
                     ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: ZodiacTextField(
-                        controller: _.searchCt,
-                        hintText: "Ara",
-                        prefixIcon: Icon(Icons.search),
-                        onChanged: (value) => _.filterTitles(value),
-                      ))
-                    ],
-                  ),
-                  10.h,
+                  if (_.allTitles != null && _.allTitles!.length > 0)
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                                child: ZodiacTextField(
+                              controller: _.searchCt,
+                              hintText: "Ara",
+                              prefixIcon: Icon(Icons.search),
+                              onChanged: (value) => _.filterTitles(value),
+                            ))
+                          ],
+                        ),
+                        10.h,
+                      ],
+                    ),
                   _.isList!
                       ? _.allTitles != null && _.allTitles!.length > 0
                           ? Expanded(
@@ -100,4 +105,3 @@ class _ExpressionsState extends State<Expressions> {
             ));
   }
 }
- */

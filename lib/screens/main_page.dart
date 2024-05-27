@@ -42,7 +42,6 @@ class _MainPageState extends State<MainPage> {
                 ),
                 15.h,
                 CardTile(
-                /*   onTap: () => _.addFavoriteDream("Rüyata At Görmek"), */
                   leading: FontAwesomeIcons.wandMagicSparkles,
                   title: "Bir uzman'dan tabir yorumu al",
                   desp:
@@ -77,7 +76,9 @@ class _MainPageState extends State<MainPage> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       subtitle: Text(
-                          "Burcunuzun günlük , haftalık , aylık ve yıllık yorumu",style: TextStyle(color: Colors.white70),),
+                        "Burcunuzun günlük , haftalık , aylık ve yıllık yorumu",
+                        style: TextStyle(color: Colors.white70),
+                      ),
                     ),
                   ),
                 ),

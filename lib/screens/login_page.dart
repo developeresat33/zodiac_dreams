@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                               height: 190,
                               width: 190,
                               decoration: BoxDecoration(
-                                  color: Color.fromRGBO(42, 48, 70, 1),
+                                  color: Color.fromRGBO(28, 35, 44, 1),
                                   borderRadius: BorderRadius.only(
                                       bottomLeft: Radius.circular(100))),
                               child: Container(

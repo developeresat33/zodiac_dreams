@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:zodiac_star/data/menu_items.dart';
 import 'package:zodiac_star/screens/expression_comment.dart';
+import 'package:zodiac_star/screens/expressions.dart';
 import 'package:zodiac_star/screens/main_page.dart';
 import 'package:zodiac_star/screens/purchase_gem.dart';
 import 'package:zodiac_star/states/home_page_provider.dart';
@@ -54,7 +55,7 @@ class _HomePageState extends State<HomePage> {
                 body: PageView(
                   physics: NeverScrollableScrollPhysics(),
                   controller: _.pageController,
-                  children: [MainPage(), Container(), ExpressionComment()],
+                  children: [MainPage(), Expressions(), ExpressionComment()],
                 ),
                 bottomNavigationBar: Theme(
                   data: Theme.of(context).copyWith(

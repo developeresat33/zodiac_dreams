@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 /* import 'package:mongo_dart/mongo_dart.dart';
- */import 'package:zodiac_star/data/dream.dart';
+ */
+import 'package:zodiac_star/data/dream.dart';
 import 'package:zodiac_star/data/mini_items.dart';
+import 'package:zodiac_star/dbHelper/firebase.dart';
 
 class ExpressionProvider extends ChangeNotifier {
   int currentIndex = 0;
@@ -17,29 +20,33 @@ class ExpressionProvider extends ChangeNotifier {
     getDreamTitles(MiniItems.alphabet[index]);
   }
 
-  getDreamTitles(String letter) async {
+  Future<void> getDreamTitles(String letter) async {
     filteredTitles!.clear();
     allTitles!.clear();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       isList = false;
-
       notifyListeners();
     });
 
-/*     var result = await MongoDatabase.dreamTitlesCollection
-        .find(where.eq('letter', letter))
-        .toList();
+    try {
+      QuerySnapshot result = await FirebaseFirestore.instance
+          .collection(FirebaseConstant.dreamTitles)
+          .where('letter', isEqualTo: letter)
+          .get();
 
-    for (var item in result) {
-      List<dynamic> itemTitles = item['titles'];
-      for (var title in itemTitles) {
-        allTitles!.add(title.toString());
-        filteredTitles!.add(title.toString());
+      for (var doc in result.docs) {
+        List<dynamic> itemTitles = doc['title'];
+        for (var title in itemTitles) {
+          allTitles!.add(title.toString());
+          filteredTitles!.add(title.toString());
+        }
       }
-    } */
-    isList = true;
+    } catch (e) {
+      print("Error fetching dream titles: $e");
+    }
 
+    isList = true;
     notifyListeners();
   }
 
@@ -54,13 +61,23 @@ class ExpressionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-/*   Future<Dream> getDreamByTitle(String title) async {
-    var result = await MongoDatabase.dreamCollection
-        .findOne(where.eq('dream_title', title));
-    return Dream.fromJson(result);
-  }
+  Future<Dream> getDreamByTitle(String title) async {
+    try {
+      QuerySnapshot result = await FirebaseFirestore.instance
+          .collection(FirebaseConstant.dreamContent)
+          .where('title', isEqualTo: title)
+          .limit(1)
+          .get();
 
-  Future<List<Map<String, dynamic>>> getExperts() async {
-    return await MongoDatabase.expertCollection.find().toList();
-  } */
+      if (result.docs.isEmpty) {
+        throw Exception("Dream with title $title not found");
+      }
+
+      var dreamData = result.docs.first.data() as Map<String, dynamic>;
+      return Dream.fromJson(dreamData);
+    } catch (e) {
+      print("Error fetching dream by title: $e");
+      rethrow;
+    }
+  }
 }
