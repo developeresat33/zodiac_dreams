@@ -12,11 +12,9 @@ import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
 class SendRequest extends StatefulWidget {
   final String? master_uid;
-  final String? master_nick;
   final String? master_name;
 
-  const SendRequest(
-      {super.key, this.master_nick, this.master_name, this.master_uid});
+  const SendRequest({super.key, this.master_name, this.master_uid});
 
   @override
   State<SendRequest> createState() => _SendRequestState();

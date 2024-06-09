@@ -3,11 +3,12 @@ class RequestModel {
   String? request_uid;
   String? sender_uid;
   String? receive_uid;
-
+  bool? isQuestionAsked;
   String? senderName;
-
   String? comment;
   String? reply;
+  String? question;
+  String? replyQuestion;
   bool? isFinish;
   DateTime? created_at;
   RequestModel({
@@ -19,7 +20,10 @@ class RequestModel {
     this.comment,
     this.reply,
     this.isFinish = false,
+    this.isQuestionAsked = false,
     this.created_at,
+    this.question,
+    this.replyQuestion,
   });
   Map<String, dynamic> toJson() {
     return {
@@ -31,7 +35,10 @@ class RequestModel {
       'sender_uid': sender_uid,
       'receive_uid': receive_uid,
       'request_uid': request_uid,
-      'created_at': created_at
+      'created_at': created_at,
+      'isQuestionAsked': isQuestionAsked,
+      'reply_question': replyQuestion,
+      'question': question
     };
   }
 }

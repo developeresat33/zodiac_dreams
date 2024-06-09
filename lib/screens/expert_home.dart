@@ -117,6 +117,13 @@ class _ExpertHomeState extends State<ExpertHome> {
                                                         request['senderName'],
                                                     dreamComment:
                                                         request['comment'],
+                                                    answer: request['reply'],
+                                                    question:
+                                                        request['question'],
+                                                    questionAnswer: request[
+                                                        'reply_question'],
+                                                    hasQuestion: request[
+                                                        'isQuestionAsked'],
                                                   )),
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,
@@ -125,6 +132,116 @@ class _ExpertHomeState extends State<ExpertHome> {
                                             ),
                                           ],
                                         ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    10.h,
+                    Row(
+                      children: [Expanded(child: Text("Biten talepler"))],
+                    ),
+                    10.h,
+                    Expanded(
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(_.userModel!.uid)
+                            .collection(FirebaseConstant.dreamRequestCollection)
+                            .where('isFinish', isEqualTo: true)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: getLoading());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Hata: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
+                            return Center(child: Text('Talep bulunamadı.'));
+                          } else {
+                            var myRequests = snapshot.data!.docs;
+                            return ListView.builder(
+                              itemCount: myRequests.length,
+                              itemBuilder: (context, index) {
+                                var request = myRequests[index];
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Color.fromRGBO(30, 33, 37, 1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  child: ListTile(
+                                    title: Text(
+                                        "Gönderen Kişi ${request['senderName']}"),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          request['comment'] ?? '',
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        5.h,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              Functions.formatTimestamp(
+                                                  request['created_at']),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                        5.h,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text("Soru Hakkı : "),
+                                            Icon(
+                                              request['isQuestionAsked']
+                                                  ? Icons.check
+                                                  : Icons.close,
+                                              color: request['isQuestionAsked']
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                            ),
+                                          ],
+                                        ),
+                                        /*               Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            ZodiacButton(
+                                              size: Size(100, 40),
+                                              onPressed: () => Get.to(() =>
+                                                  ExpertSend(
+                                                    request_uid:
+                                                        request['request_uid'],
+                                                    user_uid:
+                                                        request['sender_uid'],
+                                                    user_name:
+                                                        request['senderName'],
+                                                    dreamComment:
+                                                        request['comment'],
+                                                  )),
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text("Cevapla"),
+                                              ),
+                                            ),
+                                          ],
+                                        ), */
                                       ],
                                     ),
                                   ),

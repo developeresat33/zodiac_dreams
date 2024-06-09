@@ -167,8 +167,8 @@ class _ExpressionCommentState extends State<ExpressionComment> {
                                                   master_uid: expert['uid'],
                                                   master_name:
                                                       expert['expert_name'],
-                                                  master_nick:
-                                                      expert['expert_username'],
+                                       /*            master_nick:
+                                                      expert['expert_username'], */
                                                 ));
                                           },
                                           child: Text("Başlat"),

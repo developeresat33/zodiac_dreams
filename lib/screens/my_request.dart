@@ -130,19 +130,33 @@ class _MyRequestState extends State<MyRequest> {
                                                 Text(
                                                   request['isFinish']
                                                       ? "Tamamlandı"
-                                                      : "Yorum bekleniyor",
+                                                      : request[
+                                                              'isQuestionAsked']
+                                                          ? "Sorunuzun Yanıtı Bekleniyor"
+                                                          : "Sorunuz Yanıtlandı",
                                                 ),
                                               ],
                                             ),
                                             ZodiacButton(
                                               size: Size(100, 40),
-                                              onPressed: () =>
-                                                  Get.to(() => RequestDetail(
-                                                        question:
-                                                            request['comment'],
-                                                        answer:
-                                                            request['reply'],
-                                                      )),
+                                              onPressed: () => Get.to(() =>
+                                                  RequestDetail(
+                                                    question:
+                                                        request['comment'],
+                                                    answer: request['reply'],
+                                                    rightQuestion: request[
+                                                        'isQuestionAsked'],
+                                                    askedQuestion:
+                                                        request['question'],
+                                                    replyQuestion: request[
+                                                        'reply_question'],
+                                                    request_uid:
+                                                        request['request_uid'],
+                                                    master_name:
+                                                        request['receiveName'],
+                                                    master_uid:
+                                                        request['receive_uid'],
+                                                  )),
                                               child: Text("Detay"),
                                             ),
                                           ],
