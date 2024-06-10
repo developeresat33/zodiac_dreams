@@ -20,9 +20,43 @@ class Functions {
     return DateFormat('dd.MM.yyyy HH:mm').format(dateTime);
   }
 
- static DateTime getPSTTime() {
+  static DateTime getPSTTime() {
     final turkeyZone = tz.TZDateTime.now(tz.local);
     inspect(turkeyZone);
     return turkeyZone;
+  }
+
+  static Future<void> showYesNoDialog(Function()? onYes) async {
+    return showDialog<void>(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Onay'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Bu işlemi yapmak istediğinizden emin misiniz?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Hayır'),
+              onPressed: () {
+                Get.back();
+              },
+            ),
+            TextButton(
+              child: Text('Evet'),
+              onPressed: () async {
+                await onYes!();
+                Get.back();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

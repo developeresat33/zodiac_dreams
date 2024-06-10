@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:zodiac_star/data/request_model.dart';
 import 'package:zodiac_star/dbHelper/firebase.dart';
 import 'package:zodiac_star/services/firebase_message.dart';
@@ -39,7 +40,7 @@ class ProcessProvider extends ChangeNotifier {
 
       await senderDocRef.update({'request_uid': senderDocRef.id});
       await expertDocRef.update({'request_uid': senderDocRef.id});
-      await alertMaster();
+      await alertMaster("Talep var.");
       onLoading(true);
       GetMsg.showMsg("Talebiniz eklendi", option: 1);
     } catch (e) {
@@ -49,7 +50,65 @@ class ProcessProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> alertMaster() async {
+  Future<void> voteRequest(double rating) async {
+    onLoading(false);
+    try {
+      QuerySnapshot getExpert = await FirebaseFirestore.instance
+          .collection(FirebaseConstant.expertCollection)
+          .where('expert_name', isEqualTo: requestModel!.receiveName)
+          .get();
+      if (getExpert.docs.isNotEmpty) {
+        var doc = getExpert.docs.first;
+        var data = doc.data() as Map<String, dynamic>;
+
+        double currentRate = data['rate'] ?? 0.0;
+        int voteCount = data['vote_count'] ?? 0;
+
+        double newRate = ((currentRate * voteCount) + rating) / (voteCount + 1);
+
+        await FirebaseFirestore.instance
+            .collection(FirebaseConstant.expertCollection)
+            .doc(doc.id)
+            .update({
+          'rate': newRate,
+          'vote_count': voteCount + 1,
+        });
+      }
+
+      QuerySnapshot querySnapshotUser = await FirebaseFirestore.instance
+          .collection(FirebaseConstant.userCollection)
+          .doc(requestModel!.sender_uid)
+          .collection(FirebaseConstant.dreamRequestCollection)
+          .where('request_uid', isEqualTo: requestModel!.request_uid)
+          .get();
+
+      QuerySnapshot querySnapshotExpert = await FirebaseFirestore.instance
+          .collection(FirebaseConstant.userCollection)
+          .doc(requestModel!.receive_uid)
+          .collection(FirebaseConstant.dreamRequestCollection)
+          .where('request_uid', isEqualTo: requestModel!.request_uid)
+          .get();
+
+      if (querySnapshotUser.docs.isNotEmpty) {
+        var doc = querySnapshotUser.docs.first;
+
+        await doc.reference.update({'isRated': true, 'rate': rating});
+      }
+
+      if (querySnapshotExpert.docs.isNotEmpty) {
+        var doc = querySnapshotExpert.docs.first;
+
+        await doc.reference.update({'isRated': true, 'rate': rating});
+      }
+      onLoading(true);
+    } catch (e) {
+      GetMsg.showMsg(e.toString(), option: 0);
+      onLoading(true);
+      print(e.toString());
+    }
+  }
+
+  Future<void> alertMaster(String msg) async {
     inspect(requestModel);
     try {
       DocumentSnapshot expertSnapshot = await _firestore
@@ -63,7 +122,7 @@ class ProcessProvider extends ChangeNotifier {
       print(fcmToken);
       FirebaseMessagingHelper.sendNotification(
         "Uyarı",
-        "Talep var.",
+        msg,
         fcmToken,
       );
     } catch (e) {
@@ -73,7 +132,7 @@ class ProcessProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> alertUser() async {
+  Future<void> alertUser(String msg) async {
     try {
       DocumentSnapshot userSnapshot = await _firestore
           .collection(FirebaseConstant.userCollection)
@@ -86,7 +145,7 @@ class ProcessProvider extends ChangeNotifier {
 
       FirebaseMessagingHelper.sendNotification(
         "Uyarı",
-        "Talebiniz yorumlandı.",
+        msg,
         fcmToken,
       );
     } catch (e) {
@@ -133,7 +192,7 @@ class ProcessProvider extends ChangeNotifier {
           'reply': comment,
         });
       }
-      await alertUser();
+      await alertUser("Talebiniz yorumlandı.");
       GetMsg.showMsg("Yorum gönderildi.", option: 1);
 
       onLoading(true);
@@ -181,6 +240,7 @@ class ProcessProvider extends ChangeNotifier {
         });
       }
       onLoading(true);
+      await alertUser("Sorunuz yanıtlandı.");
       GetMsg.showMsg("Yanıtınız gönderildi.", option: 1);
     } on Exception catch (e) {
       onLoading(true);
@@ -226,10 +286,58 @@ class ProcessProvider extends ChangeNotifier {
         });
       }
       onLoading(true);
+      await alertMaster("Soru var.");
       GetMsg.showMsg("Sorunuz gönderildi.", option: 1);
     } catch (e) {
       onLoading(true);
       GetMsg.showMsg(e.toString(), option: 0);
+      print(e);
+    }
+  }
+
+  Future<void> removeRequest(bool isExpert) async {
+    QuerySnapshot? querySnapshotUser;
+    QuerySnapshot? querySnapshotExpert;
+    onLoading(false);
+
+    try {
+      if (isExpert) {
+        querySnapshotExpert = await FirebaseFirestore.instance
+            .collection(FirebaseConstant.userCollection)
+            .doc(requestModel!.receive_uid)
+            .collection(FirebaseConstant.dreamRequestCollection)
+            .where('request_uid', isEqualTo: requestModel!.request_uid)
+            .get();
+
+        for (var doc in querySnapshotExpert.docs) {
+          await FirebaseFirestore.instance
+              .collection(FirebaseConstant.userCollection)
+              .doc(requestModel!.receive_uid)
+              .collection(FirebaseConstant.dreamRequestCollection)
+              .doc(doc.id)
+              .delete();
+        }
+      } else {
+        querySnapshotUser = await FirebaseFirestore.instance
+            .collection(FirebaseConstant.userCollection)
+            .doc(requestModel!.sender_uid)
+            .collection(FirebaseConstant.dreamRequestCollection)
+            .where('request_uid', isEqualTo: requestModel!.request_uid)
+            .get();
+
+        for (var doc in querySnapshotUser.docs) {
+          await FirebaseFirestore.instance
+              .collection(FirebaseConstant.userCollection)
+              .doc(requestModel!.sender_uid)
+              .collection(FirebaseConstant.dreamRequestCollection)
+              .doc(doc.id)
+              .delete();
+        }
+      }
+      onLoading(true);
+      Get.back();
+    } catch (e) {
+      onLoading(true);
       print(e);
     }
   }

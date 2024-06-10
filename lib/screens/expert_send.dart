@@ -7,21 +7,27 @@ import 'package:zodiac_star/common_widgets/zodiac_textfield.dart';
 import 'package:zodiac_star/data/request_model.dart';
 import 'package:zodiac_star/states/process_provider.dart';
 import 'package:zodiac_star/states/user_provider.dart';
+import 'package:zodiac_star/utils/functions.dart';
 import 'package:zodiac_star/utils/int_extension.dart';
 import 'package:zodiac_star/widgets/ui/app_bar.dart';
+import 'package:zodiac_star/widgets/ui/box_const.dart';
 import 'package:zodiac_star/widgets/ui/show_msg.dart';
 
+// ignore: must_be_immutable
 class ExpertSend extends StatefulWidget {
   final String? request_uid;
   final String? user_uid;
   final String? user_name;
   final String? dreamComment;
   final bool? hasQuestion;
-  final String? answer;
+  final bool? isFinish;
+  final double? rate;
+  final bool? isRating;
+  String? answer;
   final String? question;
-  final String? questionAnswer;
+  String? questionAnswer;
 
-  const ExpertSend({
+  ExpertSend({
     super.key,
     required this.user_uid,
     required this.user_name,
@@ -31,6 +37,9 @@ class ExpertSend extends StatefulWidget {
     this.question,
     this.answer,
     this.questionAnswer,
+    this.isFinish,
+    this.rate,
+    this.isRating,
   });
 
   @override
@@ -69,114 +78,134 @@ class _ExpertSendState extends State<ExpertSend> {
   Widget build(BuildContext context) {
     return Consumer(
         builder: (context, ProcessProvider _, child) => Scaffold(
-              appBar: AppBarWidget.getAppBar("Rüyayı Yorumla"),
+              appBar: AppBarWidget.getAppBar("Rüyayı Yorumla",
+                  isAction: true,
+                  action: widget.questionAnswer != null &&
+                          widget.questionAnswer != "" &&
+                          widget.answer != "" &&
+                          widget.answer != null
+                      ? TextButton(
+                          onPressed: () => Functions.showYesNoDialog(
+                              () => _.removeRequest(true)),
+                          child: Text("Kaldır"))
+                      : SizedBox(
+                          height: 10,
+                          width: 10,
+                        )),
               body: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    20.h,
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text(
-                          "Talep : " + widget.dreamComment!,
-                          style: TextStyle(fontSize: 16),
-                        ))
-                      ],
-                    ),
-                    if (widget.answer != null && widget.answer != "")
-                      SingleChildScrollView(
+                    Expanded(
+                      child: SingleChildScrollView(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            10.h,
+                            20.h,
                             Row(
-                              children: [Text("Yanıtınız : ")],
+                              children: [
+                                Text(
+                                  "Talep : ",
+                                  style: TextStyle(fontSize: 16),
+                                )
+                              ],
                             ),
                             10.h,
                             Container(
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(30, 33, 37, 1),
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                              ),
+                              decoration: getDecoration(),
                               padding: EdgeInsets.all(10),
                               child: Text(
-                                widget.answer!,
+                                widget.dreamComment!,
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.white,
                                 ),
                               ),
                             ),
-                            if (widget.question != null &&
-                                widget.question != "")
+                            if (widget.answer != null && widget.answer != "")
                               Column(
-                                children: [
-                                  10.h,
-                                ],
-                              ),
-                            Row(
-                              children: [Text("Kullanıcının Sorusu : ")],
-                            ),
-                            10.h,
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(30, 33, 37, 1),
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
-                                ),
-                              ),
-                              padding: EdgeInsets.all(10),
-                              child: Text(
-                                widget.question!,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            10.h,
-                            if (widget.questionAnswer != null &&
-                                widget.questionAnswer != "")
-                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   10.h,
                                   Row(
-                                    children: [Text("Sorunun Yanıtı : ")],
+                                    children: [Text("Yanıtınız : ")],
                                   ),
                                   10.h,
                                   Container(
-                                    decoration: BoxDecoration(
-                                      color: Color.fromRGBO(30, 33, 37, 1),
-                                      borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10),
-                                        bottomRight: Radius.circular(10),
-                                      ),
-                                    ),
+                                    decoration: getDecoration(),
                                     padding: EdgeInsets.all(10),
                                     child: Text(
-                                      widget.questionAnswer!,
+                                      widget.answer!,
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: Colors.white,
                                       ),
                                     ),
                                   ),
+                                  if (widget.question != null &&
+                                      widget.question != "")
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        10.h,
+                                        Row(
+                                          children: [
+                                            Text("Kullanıcının Sorusu : ")
+                                          ],
+                                        ),
+                                        10.h,
+                                        Container(
+                                          decoration: getDecoration(),
+                                          padding: EdgeInsets.all(10),
+                                          child: Text(
+                                            widget.question!,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  10.h,
+                                  if (widget.questionAnswer != null &&
+                                      widget.questionAnswer != "")
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        10.h,
+                                        Row(
+                                          children: [Text("Sorunun Yanıtı : ")],
+                                        ),
+                                        10.h,
+                                        Container(
+                                          decoration: getDecoration(),
+                                          padding: EdgeInsets.all(10),
+                                          child: Text(
+                                            widget.questionAnswer!,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                 ],
                               ),
                           ],
                         ),
                       ),
-                    if (!hasSentRequest!) ...[
-                      Spacer(),
+                    ),
+                    if ((widget.hasQuestion! &&
+                            (widget.questionAnswer == null ||
+                                widget.questionAnswer == "")) ||
+                        (!widget.hasQuestion! &&
+                            (widget.answer == null ||
+                                widget.answer == ""))) ...[
                       Row(
                         children: [
                           Expanded(
@@ -190,13 +219,28 @@ class _ExpertSendState extends State<ExpertSend> {
                             icon: Icon(Icons.send, color: Colors.white),
                             onPressed: () async {
                               if (_requestController.text.isNotEmpty) {
-                                await _.replyRequest(
-                                  _requestController.text,
-                                );
-                                setState(() {
-                                  userRequest = _requestController.text;
-                                  hasSentRequest = true;
-                                });
+                                if (widget.hasQuestion!) {
+                                  await _.replyQuestion(
+                                    _requestController.text,
+                                  );
+
+                                  setState(() {
+                                    widget.questionAnswer =
+                                        _requestController.text;
+                                    hasSentRequest = true;
+                                  });
+
+                                  _requestController.clear();
+                                } else {
+                                  await _.replyRequest(
+                                    _requestController.text,
+                                  );
+                                  setState(() {
+                                    widget.answer = _requestController.text;
+                                    hasSentRequest = true;
+                                  });
+                                  _requestController.clear();
+                                }
                               } else {
                                 GetMsg.showMsg("Lütfen boş bırakmayınız",
                                     option: 0);
@@ -207,62 +251,56 @@ class _ExpertSendState extends State<ExpertSend> {
                       ),
                       10.h,
                     ] else ...[
-                      if (userRequest!="")
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              10.h,
-                              Text(
-                                "Gönderdiğiniz Rüya Yorumu:",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              10.h,
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(30, 33, 37, 1),
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10),
-                                    bottomRight: Radius.circular(10),
+                      if ((widget.hasQuestion! &&
+                              (widget.questionAnswer != null ||
+                                  widget.questionAnswer != "")) ||
+                          (!widget.hasQuestion! &&
+                              (widget.answer != null || widget.answer != "")))
+                        widget.isFinish != null &&
+                                !widget.isFinish! &&
+                                !widget.hasQuestion!
+                            ? Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 2,
+                                          child: Text(
+                                            "Yorumunuz tamamlandı.",
+                                          )),
+                                      5.w,
+                                      Expanded(
+                                          child: ZodiacButton(
+                                              size: Size(70, 30),
+                                              onPressed: () => Get.back(),
+                                              child: Text("Tamam")))
+                                    ],
                                   ),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  userRequest,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
+                                  10.h,
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 2,
+                                          child: Text(
+                                            widget.isRating == true
+                                                ? "Aldığınız Puan : ${widget.rate}"
+                                                : "Henüz Puanlanmadı",
+                                          )),
+                                      5.w,
+                                      Expanded(
+                                          child: ZodiacButton(
+                                              size: Size(70, 30),
+                                              onPressed: () => Get.back(),
+                                              child: Text("Tamam")))
+                                    ],
                                   ),
-                                ),
+                                  10.h,
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      Spacer(),
-                      Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Yorumunuz tamamlandı.",
-                                  )),
-                              5.w,
-                              Expanded(
-                                  child: ZodiacButton(
-                                      size: Size(70, 30),
-                                      onPressed: () => Get.back(),
-                                      child: Text("Tamam")))
-                            ],
-                          ),
-                          10.h,
-                        ],
-                      ),
                     ],
                   ],
                 ),

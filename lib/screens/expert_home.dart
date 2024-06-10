@@ -208,40 +208,49 @@ class _ExpertHomeState extends State<ExpertHome> {
                                               MainAxisAlignment.start,
                                           children: [
                                             Text("Soru Hakkı : "),
-                                            Icon(
-                                              request['isQuestionAsked']
-                                                  ? Icons.check
-                                                  : Icons.close,
-                                              color: request['isQuestionAsked']
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                            ),
+                                            Text(!request['isQuestionAsked']
+                                                ? "Var"
+                                                : "Kalmadı")
                                           ],
                                         ),
-                                        /*               Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            ZodiacButton(
-                                              size: Size(100, 40),
-                                              onPressed: () => Get.to(() =>
-                                                  ExpertSend(
-                                                    request_uid:
-                                                        request['request_uid'],
-                                                    user_uid:
-                                                        request['sender_uid'],
-                                                    user_name:
-                                                        request['senderName'],
-                                                    dreamComment:
-                                                        request['comment'],
-                                                  )),
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Text("Cevapla"),
+                                        if (request['isQuestionAsked'] &&
+                                            request['isFinish'])
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              ZodiacButton(
+                                                size: Size(100, 40),
+                                                onPressed: () => Get.to(() =>
+                                                    ExpertSend(
+                                                      request_uid: request[
+                                                          'request_uid'],
+                                                      user_uid:
+                                                          request['sender_uid'],
+                                                      user_name:
+                                                          request['senderName'],
+                                                      dreamComment:
+                                                          request['comment'],
+                                                      answer: request['reply'],
+                                                      question:
+                                                          request['question'],
+                                                      questionAnswer: request[
+                                                          'reply_question'],
+                                                      hasQuestion: request[
+                                                          'isQuestionAsked'],
+                                                      isFinish:
+                                                          request['isFinish'],
+                                                      rate: request['rate'],
+                                                      isRating:
+                                                          request['isRated'],
+                                                    )),
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Text("Detay"),
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ), */
+                                            ],
+                                          ),
                                       ],
                                     ),
                                   ),

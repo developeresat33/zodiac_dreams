@@ -133,7 +133,7 @@ class _MyRequestState extends State<MyRequest> {
                                                       : request[
                                                               'isQuestionAsked']
                                                           ? "Sorunuzun Yanıtı Bekleniyor"
-                                                          : "Sorunuz Yanıtlandı",
+                                                          : "Bekleniyor..",
                                                 ),
                                               ],
                                             ),
@@ -156,6 +156,8 @@ class _MyRequestState extends State<MyRequest> {
                                                         request['receiveName'],
                                                     master_uid:
                                                         request['receive_uid'],
+                                                    isRated: request['isRated'],
+                                                    rate: request['rate'],
                                                   )),
                                               child: Text("Detay"),
                                             ),

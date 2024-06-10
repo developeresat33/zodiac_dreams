@@ -10,23 +10,27 @@ class RequestModel {
   String? question;
   String? replyQuestion;
   bool? isFinish;
+  bool? isRated;
   DateTime? created_at;
-  RequestModel({
-    this.receiveName,
-    this.request_uid,
-    this.sender_uid,
-    this.receive_uid,
-    this.senderName,
-    this.comment,
-    this.reply,
-    this.isFinish = false,
-    this.isQuestionAsked = false,
-    this.created_at,
-    this.question,
-    this.replyQuestion,
-  });
+  double? rate;
+  RequestModel(
+      {this.receiveName,
+      this.request_uid,
+      this.sender_uid,
+      this.receive_uid,
+      this.senderName,
+      this.comment,
+      this.reply,
+      this.isFinish = false,
+      this.isQuestionAsked = false,
+      this.isRated = false,
+      this.created_at,
+      this.question,
+      this.replyQuestion,
+      this.rate = 0.0});
   Map<String, dynamic> toJson() {
     return {
+      'rate': rate,
       'receiveName': receiveName,
       'senderName': senderName,
       'comment': comment,
@@ -38,7 +42,8 @@ class RequestModel {
       'created_at': created_at,
       'isQuestionAsked': isQuestionAsked,
       'reply_question': replyQuestion,
-      'question': question
+      'question': question,
+      'isRated': isRated
     };
   }
 }
