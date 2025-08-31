@@ -1,16 +1,27 @@
-# Zodyak Yıldızı
+🌌 Zodyak Yıldızı
 
-A new Flutter project.
+Zodyak Yıldızı; burç, astroloji ve fal bakımına odaklanan, ücretsiz ve açık kaynaklı bir Flutter projesidir.
+Uygulama, kullanıcıların taleplerini admin paneli üzerinden yorumlayabilmesi ve bildirim servisleri sayesinde etkileşimli bir deneyim sunması için tasarlandı.
 
-## Getting Started
+🚀 Özellikler
 
-This project is a starting point for a Flutter application.
+📱 Modern Flutter yapısı (Material 3 uyumlu)
 
-A few resources to get you started if this is your first Flutter project:
+🔑 Admin girişi ve yönetim paneli
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+💬 Fal taleplerini yorumlama özelliği
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+🔔 Firebase Cloud Messaging ile push bildirimleri
+
+🔥 Firebase Realtime Database & Firestore entegrasyonu
+
+🎨 Kolay özelleştirilebilir arayüz
+
+🛠 Kullanılan Teknolojiler
+Teknoloji	Kullanım Amacı
+Flutter	Mobil uygulama geliştirme
+Firebase Authentication	Kullanıcı ve admin giriş sistemi
+Firebase Firestore	Talep, yorum ve kullanıcı verilerinin saklanması
+Firebase Cloud Messaging	Anlık bildirim gönderimi
+Provider Durum yönetimi
+Dart	Uygulama dili
